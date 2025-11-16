@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDF发票生成器</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📄 PDF发票生成器</h1>
+            <p class="subtitle">快速生成专业的PDF格式发票</p>
+        </header>
+
+        <form id="invoiceForm" class="invoice-form">
+            <!-- 公司信息 -->
+            <section class="form-section">
+                <h2>开票方信息</h2>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="company_name">公司名称 <span class="required">*</span></label>
+                        <input type="text" id="company_name" name="company_name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="company_address">公司地址 <span class="required">*</span></label>
+                        <input type="text" id="company_address" name="company_address" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="company_phone">联系电话</label>
+                        <input type="text" id="company_phone" name="company_phone">
+                    </div>
+                    <div class="form-group">
+                        <label for="company_email">邮箱地址</label>
+                        <input type="email" id="company_email" name="company_email">
+                    </div>
+                </div>
+            </section>
+
+            <!-- 客户信息 -->
+            <section class="form-section">
+                <h2>收票方信息</h2>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="customer_name">客户名称 <span class="required">*</span></label>
+                        <input type="text" id="customer_name" name="customer_name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="customer_address">客户地址 <span class="required">*</span></label>
+                        <input type="text" id="customer_address" name="customer_address" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="customer_phone">联系电话</label>
+                        <input type="text" id="customer_phone" name="customer_phone">
+                    </div>
+                    <div class="form-group">
+                        <label for="customer_email">邮箱地址</label>
+                        <input type="email" id="customer_email" name="customer_email">
+                    </div>
+                </div>
+            </section>
+
+            <!-- 发票信息 -->
+            <section class="form-section">
+                <h2>发票信息</h2>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="invoice_number">发票号码 <span class="required">*</span></label>
+                        <input type="text" id="invoice_number" name="invoice_number" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="invoice_date">开票日期 <span class="required">*</span></label>
+                        <input type="date" id="invoice_date" name="invoice_date" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="due_date">到期日期 <span class="required">*</span></label>
+                        <input type="date" id="due_date" name="due_date" required>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 发票项目 -->
+            <section class="form-section">
+                <div class="section-header">
+                    <h2>发票项目</h2>
+                    <button type="button" class="btn btn-secondary" id="addItemBtn">+ 添加项目</button>
+                </div>
+                <div id="itemsContainer">
+                    <div class="item-row" data-item-index="0">
+                        <div class="form-group">
+                            <label>项目描述 <span class="required">*</span></label>
+                            <input type="text" name="item_description_0" required>
+                        </div>
+                        <div class="form-group">
+                            <label>数量 <span class="required">*</span></label>
+                            <input type="number" name="item_quantity_0" step="0.01" min="0" required>
+                        </div>
+                        <div class="form-group">
+                            <label>单价 <span class="required">*</span></label>
+                            <input type="number" name="item_unit_price_0" step="0.01" min="0" required>
+                        </div>
+                        <div class="form-group">
+                            <label>金额</label>
+                            <input type="number" name="item_amount_0" step="0.01" min="0" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label>&nbsp;</label>
+                            <button type="button" class="btn btn-danger btn-small remove-item" style="display:none;">删除</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 费用信息 -->
+            <section class="form-section">
+                <h2>费用信息</h2>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="tax_rate">税率 (%)</label>
+                        <input type="number" id="tax_rate" name="tax_rate" step="0.01" min="0" value="0">
+                    </div>
+                    <div class="form-group">
+                        <label for="discount">折扣金额</label>
+                        <input type="number" id="discount" name="discount" step="0.01" min="0" value="0">
+                    </div>
+                </div>
+            </section>
+
+            <!-- 支付信息 -->
+            <section class="form-section">
+                <h2>支付信息（可选）</h2>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="bank">银行名称</label>
+                        <input type="text" id="bank" name="bank">
+                    </div>
+                    <div class="form-group">
+                        <label for="account">账户号码</label>
+                        <input type="text" id="account" name="account">
+                    </div>
+                    <div class="form-group">
+                        <label for="swift">SWIFT代码</label>
+                        <input type="text" id="swift" name="swift">
+                    </div>
+                </div>
+            </section>
+
+            <!-- 备注 -->
+            <section class="form-section">
+                <h2>备注</h2>
+                <div class="form-group">
+                    <label for="notes">备注信息</label>
+                    <textarea id="notes" name="notes" rows="3" placeholder="请输入备注信息..."></textarea>
+                </div>
+            </section>
+
+            <!-- 总计预览 -->
+            <section class="form-section summary-section">
+                <h2>费用总计</h2>
+                <div class="summary-box">
+                    <div class="summary-row">
+                        <span>小计:</span>
+                        <span id="subtotal">¥0.00</span>
+                    </div>
+                    <div class="summary-row">
+                        <span>折扣:</span>
+                        <span id="discount-display">-¥0.00</span>
+                    </div>
+                    <div class="summary-row">
+                        <span>税费:</span>
+                        <span id="tax-amount">¥0.00</span>
+                    </div>
+                    <div class="summary-row total">
+                        <span>总计:</span>
+                        <span id="total">¥0.00</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 提交按钮 -->
+            <div class="form-actions">
+                <button type="button" class="btn btn-secondary" id="previewBtn">预览总计</button>
+                <button type="submit" class="btn btn-primary">生成PDF发票</button>
+            </div>
+        </form>
+
+        <!-- 消息提示 -->
+        <div id="message" class="message"></div>
+    </div>
+
+    <script>
+        // 设置默认日期
+        document.addEventListener('DOMContentLoaded', function() {
+            const today = new Date().toISOString().split('T')[0];
+            const dueDate = new Date();
+            dueDate.setDate(dueDate.getDate() + 30);
+            const dueDateStr = dueDate.toISOString().split('T')[0];
+            
+            document.getElementById('invoice_date').value = today;
+            document.getElementById('due_date').value = dueDateStr;
+
+            // 初始化项目计数
+            let itemCount = 1;
+            document.getElementById('invoiceForm').setAttribute('data-item-count', itemCount);
+
+            // 添加项目
+            document.getElementById('addItemBtn').addEventListener('click', function() {
+                const container = document.getElementById('itemsContainer');
+                const newItem = container.firstElementChild.cloneNode(true);
+                const index = itemCount;
+                
+                newItem.setAttribute('data-item-index', index);
+                newItem.querySelector('input[name^="item_description"]').name = `item_description_${index}`;
+                newItem.querySelector('input[name^="item_description"]').value = '';
+                newItem.querySelector('input[name^="item_quantity"]').name = `item_quantity_${index}`;
+                newItem.querySelector('input[name^="item_quantity"]').value = '';
+                newItem.querySelector('input[name^="item_unit_price"]').name = `item_unit_price_${index}`;
+                newItem.querySelector('input[name^="item_unit_price"]').value = '';
+                newItem.querySelector('input[name^="item_amount"]').name = `item_amount_${index}`;
+                newItem.querySelector('input[name^="item_amount"]').value = '';
+                newItem.querySelector('.remove-item').style.display = 'block';
+                
+                container.appendChild(newItem);
+                itemCount++;
+                document.getElementById('invoiceForm').setAttribute('data-item-count', itemCount);
+                
+                attachItemListeners(newItem);
+            });
+
+            // 删除项目
+            document.getElementById('itemsContainer').addEventListener('click', function(e) {
+                if (e.target.classList.contains('remove-item')) {
+                    const itemRow = e.target.closest('.item-row');
+                    if (document.getElementById('itemsContainer').children.length > 1) {
+                        itemRow.remove();
+                        itemCount--;
+                        document.getElementById('invoiceForm').setAttribute('data-item-count', itemCount);
+                        updateSummary();
+                    }
+                }
+            });
+
+            // 自动计算金额
+            function attachItemListeners(itemRow) {
+                const quantityInput = itemRow.querySelector('input[name^="item_quantity"]');
+                const priceInput = itemRow.querySelector('input[name^="item_unit_price"]');
+                const amountInput = itemRow.querySelector('input[name^="item_amount"]');
+                
+                function calculateAmount() {
+                    const qty = parseFloat(quantityInput.value) || 0;
+                    const price = parseFloat(priceInput.value) || 0;
+                    amountInput.value = (qty * price).toFixed(2);
+                    updateSummary();
+                }
+                
+                quantityInput.addEventListener('input', calculateAmount);
+                priceInput.addEventListener('input', calculateAmount);
+            }
+
+            // 为所有项目添加监听器
+            document.querySelectorAll('.item-row').forEach(item => {
+                attachItemListeners(item);
+            });
+
+            // 更新总计
+            function updateSummary() {
+                let subtotal = 0;
+                document.querySelectorAll('input[name^="item_amount"]').forEach(input => {
+                    subtotal += parseFloat(input.value) || 0;
+                });
+
+                const taxRate = parseFloat(document.getElementById('tax_rate').value) || 0;
+                const discount = parseFloat(document.getElementById('discount').value) || 0;
+                const taxAmount = subtotal * (taxRate / 100);
+                const total = subtotal - discount + taxAmount;
+
+                document.getElementById('subtotal').textContent = '¥' + subtotal.toFixed(2);
+                document.getElementById('discount-display').textContent = '-¥' + discount.toFixed(2);
+                document.getElementById('tax-amount').textContent = '¥' + taxAmount.toFixed(2);
+                document.getElementById('total').textContent = '¥' + total.toFixed(2);
+            }
+
+            // 监听税率和折扣变化
+            document.getElementById('tax_rate').addEventListener('input', updateSummary);
+            document.getElementById('discount').addEventListener('input', updateSummary);
+
+            // 预览总计
+            document.getElementById('previewBtn').addEventListener('click', function() {
+                updateSummary();
+                showMessage('总计已更新', 'success');
+            });
+
+            // 表单提交
+            document.getElementById('invoiceForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const formData = new FormData(this);
+                formData.append('item_count', itemCount);
+
+                // 显示加载状态
+                const submitBtn = this.querySelector('button[type="submit"]');
+                const originalText = submitBtn.textContent;
+                submitBtn.disabled = true;
+                submitBtn.textContent = '生成中...';
+
+                fetch('/generate', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        showMessage('发票生成成功！正在下载...', 'success');
+                        // 自动下载
+                        setTimeout(() => {
+                            window.location.href = data.download_url;
+                            submitBtn.disabled = false;
+                            submitBtn.textContent = originalText;
+                        }, 500);
+                    } else {
+                        showMessage('生成失败: ' + data.error, 'error');
+                        submitBtn.disabled = false;
+                        submitBtn.textContent = originalText;
+                    }
+                })
+                .catch(error => {
+                    showMessage('发生错误: ' + error.message, 'error');
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = originalText;
+                });
+            });
+
+            // 显示消息
+            function showMessage(text, type) {
+                const messageDiv = document.getElementById('message');
+                messageDiv.textContent = text;
+                messageDiv.className = 'message ' + type;
+                messageDiv.style.display = 'block';
+                
+                setTimeout(() => {
+                    messageDiv.style.display = 'none';
+                }, 3000);
+            }
+        });
+    </script>
+</body>
+</html>
+
