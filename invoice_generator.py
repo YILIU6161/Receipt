@@ -227,31 +227,6 @@ class InvoiceGenerator:
         if pin:
             customer_data.append([f"Pin: {pin}"])
         
-        # 添加State Code
-        state_code = customer_info.get('state_code', '')
-        if state_code:
-            customer_data.append([f"CHAKAN State Code: {state_code}"])
-        
-        # 添加Registered Office Address
-        registered_address = customer_info.get('registered_address', '')
-        if registered_address:
-            customer_data.append([f"Registered Office Address: {registered_address}"])
-        
-        # 添加PAN NO.
-        pan_no = customer_info.get('pan_no', '')
-        if pan_no:
-            customer_data.append([f"Company PAN NO.: {pan_no}"])
-        
-        # 添加GST NO.
-        gst_no = customer_info.get('gst_no', '')
-        if gst_no:
-            customer_data.append([f"Company GST NO.MAHARASHTRA: {gst_no}"])
-        
-        # 添加IEC No.
-        iec_no = customer_info.get('iec_no', '')
-        if iec_no:
-            customer_data.append([f"IEC No.: {iec_no}"])
-        
         # 添加其他基本信息
         address = customer_info.get('address', '')
         if address and not plant_address:

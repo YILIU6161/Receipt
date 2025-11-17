@@ -122,11 +122,6 @@ def generate_invoice():
             'email': data.get('customer_email', ''),
             'plant_address': data.get('plant_address', ''),
             'pin': data.get('pin', ''),
-            'state_code': data.get('state_code', ''),
-            'registered_address': data.get('registered_address', ''),
-            'pan_no': data.get('pan_no', ''),
-            'gst_no': data.get('gst_no', ''),
-            'iec_no': data.get('iec_no', ''),
             'other': data.get('customer_other', '')
         }
         
