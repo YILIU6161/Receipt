@@ -105,20 +105,50 @@ def generate_invoice():
             'email': data.get('company_email', '')
         }
         
-        # 客户信息
+        # 发货方信息（可选）
+        shipper_info = None
+        if data.get('shipper_name'):
+            shipper_info = {
+                'name': data.get('shipper_name', ''),
+                'address': data.get('shipper_address', ''),
+                'phone': data.get('shipper_phone', '')
+            }
+        
+        # 客户信息（Consignee/Buyer）
         customer_info = {
             'name': data.get('customer_name', ''),
             'address': data.get('customer_address', ''),
             'phone': data.get('customer_phone', ''),
             'email': data.get('customer_email', ''),
+            'plant_address': data.get('plant_address', ''),
+            'pin': data.get('pin', ''),
+            'state_code': data.get('state_code', ''),
+            'registered_address': data.get('registered_address', ''),
+            'pan_no': data.get('pan_no', ''),
+            'gst_no': data.get('gst_no', ''),
+            'iec_no': data.get('iec_no', ''),
             'other': data.get('customer_other', '')
         }
+        
+        # 运输详情（可选）
+        shipping_info = None
+        if data.get('port_of_shipment') or data.get('country_of_origin') or data.get('port_of_destination'):
+            shipping_info = {
+                'port_of_shipment': data.get('port_of_shipment', ''),
+                'country_of_origin': data.get('country_of_origin', ''),
+                'port_of_destination': data.get('port_of_destination', ''),
+                'place_of_destination': data.get('place_of_destination', ''),
+                'shipment_term': data.get('shipment_term', '')
+            }
+        
+        # 产品总体描述（可选）
+        product_description = data.get('product_description', '')
         
         # 发票信息
         invoice_info = {
             'number': data.get('invoice_number', ''),
             'date': data.get('invoice_date', datetime.now().strftime('%Y-%m-%d')),
-            'due_date': data.get('due_date', (datetime.now() + timedelta(days=30)).strftime('%Y-%m-%d'))
+            'po_number': data.get('po_number', '')
         }
         
         # 发票项目
@@ -128,6 +158,7 @@ def generate_invoice():
         for i in range(item_count):
             description = data.get(f'item_description_{i}', '')
             if description:  # 只添加非空项目
+                product_name = data.get(f'item_product_name_{i}', '')
                 product_number = data.get(f'item_product_number_{i}', '')
                 item_number = data.get(f'item_item_number_{i}', '')
                 hs_code = data.get(f'item_hs_code_{i}', '')
@@ -136,6 +167,7 @@ def generate_invoice():
                 amount = float(data.get(f'item_amount_{i}', 0) or (quantity * unit_price))
                 
                 items.append({
+                    'product_name': product_name,
                     'product_number': product_number,
                     'item_number': item_number,
                     'hs_code': hs_code,
@@ -176,7 +208,10 @@ def generate_invoice():
                 notes=notes if notes else None,
                 payment_info=payment_info,
                 logo_path=logo_path,
-                stamp_path=stamp_path
+                stamp_path=stamp_path,
+                shipper_info=shipper_info,
+                shipping_info=shipping_info,
+                product_description=product_description if product_description else None
             )
         except Exception as e:
             # 如果生成失败，清理上传的文件

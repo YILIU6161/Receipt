@@ -172,7 +172,7 @@ header h1 {
 /* 项目行 */
 .item-row {
     display: grid;
-    grid-template-columns: 1.2fr 1.2fr 1.2fr 2fr 0.9fr 1fr 1fr auto;
+    grid-template-columns: 1.5fr 1.2fr 1.2fr 1.2fr 2fr 0.9fr 1fr 1fr auto;
     gap: 8px;
     align-items: end;
     padding: 12px;

@@ -69,7 +69,7 @@ class InvoiceGenerator:
                 
                 # 创建Logo和标题的布局
                 header_data = [
-                    [logo_img, Paragraph("INVOICE", ParagraphStyle(
+                    [logo_img, Paragraph("COMMERCIAL INVOICE", ParagraphStyle(
                         'CustomTitle',
                         parent=self.styles['Heading1'],
                         fontSize=20,
@@ -96,7 +96,7 @@ class InvoiceGenerator:
                     spaceAfter=20,
                     alignment=1  # 居中
                 )
-                title = Paragraph("INVOICE", title_style)
+                title = Paragraph("COMMERCIAL INVOICE", title_style)
                 self.story.append(title)
         else:
             # 没有Logo时使用默认标题
@@ -113,28 +113,27 @@ class InvoiceGenerator:
         
         self.story.append(Spacer(1, 0.3*cm))
         
-        # 创建两列布局：公司信息和发票信息
-        company_data = [
-            ['<b>Bill From</b>'],
-            [f"Company Name: {company_info.get('name', '')}"],
-            [f"Address: {company_info.get('address', '')}"],
-            [f"Phone: {company_info.get('phone', '')}"],
-            [f"Email: {company_info.get('email', '')}"],
+        # 创建两列布局：Issuer信息和发票信息
+        issuer_data = [
+            ['<b>Issuer</b>'],
+            [f"{company_info.get('name', '')}"],
+            [f"{company_info.get('address', '')}"],
+            [f"{company_info.get('phone', '')}"],
         ]
         
         invoice_data = [
             ['<b>Invoice Information</b>'],
-            [f"Invoice Number: {invoice_info.get('number', '')}"],
-            [f"Invoice Date: {invoice_info.get('date', '')}"],
-            [f"Due Date: {invoice_info.get('due_date', '')}"],
+            [f"Invoice No.: {invoice_info.get('number', '')}"],
+            [f"Date: {invoice_info.get('date', '')}"],
+            [f"Purchase Order No.: {invoice_info.get('po_number', '')}"],
         ]
         
         # 创建表格
-        company_table = Table(company_data, colWidths=[8*cm])
+        issuer_table = Table(issuer_data, colWidths=[8*cm])
         invoice_table = Table(invoice_data, colWidths=[8*cm])
         
         # 设置表格样式
-        company_table.setStyle(TableStyle([
+        issuer_table.setStyle(TableStyle([
             ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#f0f0f0')),
             ('TEXTCOLOR', (0, 0), (-1, 0), colors.black),
             ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
@@ -164,7 +163,7 @@ class InvoiceGenerator:
         
         # 创建并排的两个表格
         combined_table = Table([
-            [company_table, invoice_table]
+            [issuer_table, invoice_table]
         ], colWidths=[8*cm, 8*cm])
         
         combined_table.setStyle(TableStyle([
@@ -174,20 +173,97 @@ class InvoiceGenerator:
         self.story.append(combined_table)
         self.story.append(Spacer(1, 0.5*cm))
     
-    def add_customer_info(self, customer_info: Dict[str, str]):
+    def add_shipper_info(self, shipper_info: Dict[str, str]):
         """
-        添加客户信息
+        添加发货方信息
         
         Args:
-            customer_info: 客户信息字典 {'name': '', 'address': '', 'phone': '', 'email': '', 'other': ''}
+            shipper_info: 发货方信息字典 {'name': '', 'address': '', 'phone': ''}
+        """
+        shipper_data = [
+            ['<b>Shipper</b>'],
+            [f"{shipper_info.get('name', '')}"],
+            [f"{shipper_info.get('address', '')}"],
+            [f"{shipper_info.get('phone', '')}"],
+        ]
+        
+        shipper_table = Table(shipper_data, colWidths=[16*cm])
+        shipper_table.setStyle(TableStyle([
+            ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#e8e8e8')),
+            ('TEXTCOLOR', (0, 0), (-1, 0), colors.black),
+            ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+            ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+            ('FONTSIZE', (0, 0), (-1, 0), 11),
+            ('BOTTOMPADDING', (0, 0), (-1, 0), 8),
+            ('BACKGROUND', (0, 1), (-1, -1), colors.white),
+            ('FONTNAME', (0, 1), (-1, -1), 'Helvetica'),
+            ('FONTSIZE', (0, 1), (-1, -1), 9),
+            ('GRID', (0, 0), (-1, -1), 1, colors.grey),
+            ('VALIGN', (0, 0), (-1, -1), 'TOP'),
+        ]))
+        
+        self.story.append(shipper_table)
+        self.story.append(Spacer(1, 0.3*cm))
+    
+    def add_customer_info(self, customer_info: Dict[str, str]):
+        """
+        添加收货方/买方信息
+        
+        Args:
+            customer_info: 客户信息字典，包含所有字段
         """
         customer_data = [
-            ['<b>Bill To</b>'],
-            [f"Customer Name: {customer_info.get('name', '')}"],
-            [f"Address: {customer_info.get('address', '')}"],
-            [f"Phone: {customer_info.get('phone', '')}"],
-            [f"Email: {customer_info.get('email', '')}"],
+            ['<b>Consignee/Buyer</b>'],
+            [f"Company Name: {customer_info.get('name', '')}"],
         ]
+        
+        # 添加Plant Address
+        plant_address = customer_info.get('plant_address', '')
+        if plant_address:
+            customer_data.append([f"Plant Address: {plant_address}"])
+        
+        # 添加Pin
+        pin = customer_info.get('pin', '')
+        if pin:
+            customer_data.append([f"Pin: {pin}"])
+        
+        # 添加State Code
+        state_code = customer_info.get('state_code', '')
+        if state_code:
+            customer_data.append([f"CHAKAN State Code: {state_code}"])
+        
+        # 添加Registered Office Address
+        registered_address = customer_info.get('registered_address', '')
+        if registered_address:
+            customer_data.append([f"Registered Office Address: {registered_address}"])
+        
+        # 添加PAN NO.
+        pan_no = customer_info.get('pan_no', '')
+        if pan_no:
+            customer_data.append([f"Company PAN NO.: {pan_no}"])
+        
+        # 添加GST NO.
+        gst_no = customer_info.get('gst_no', '')
+        if gst_no:
+            customer_data.append([f"Company GST NO.MAHARASHTRA: {gst_no}"])
+        
+        # 添加IEC No.
+        iec_no = customer_info.get('iec_no', '')
+        if iec_no:
+            customer_data.append([f"IEC No.: {iec_no}"])
+        
+        # 添加其他基本信息
+        address = customer_info.get('address', '')
+        if address and not plant_address:
+            customer_data.append([f"Address: {address}"])
+        
+        phone = customer_info.get('phone', '')
+        if phone:
+            customer_data.append([f"Phone: {phone}"])
+        
+        email = customer_info.get('email', '')
+        if email:
+            customer_data.append([f"Email: {email}"])
         
         # 如果有其他内容，添加到列表中
         other = customer_info.get('other', '')
@@ -210,50 +286,120 @@ class InvoiceGenerator:
         ]))
         
         self.story.append(customer_table)
-        self.story.append(Spacer(1, 0.5*cm))
+        self.story.append(Spacer(1, 0.3*cm))
     
-    def add_items(self, items: List[Dict[str, any]]):
+    def add_shipping_details(self, shipping_info: Dict[str, str]):
+        """
+        添加运输详情
+        
+        Args:
+            shipping_info: 运输信息字典
+        """
+        shipping_data = [
+            ['<b>Shipping Details</b>'],
+        ]
+        
+        port_of_shipment = shipping_info.get('port_of_shipment', '')
+        if port_of_shipment:
+            shipping_data.append([f"Port of Shipment: {port_of_shipment}"])
+        
+        country_of_origin = shipping_info.get('country_of_origin', '')
+        if country_of_origin:
+            shipping_data.append([f"Country of Origin: {country_of_origin}"])
+        
+        port_of_destination = shipping_info.get('port_of_destination', '')
+        if port_of_destination:
+            shipping_data.append([f"Port of Destination: {port_of_destination}"])
+        
+        place_of_destination = shipping_info.get('place_of_destination', '')
+        if place_of_destination:
+            shipping_data.append([f"Place of Final Destination: {place_of_destination}"])
+        
+        shipment_term = shipping_info.get('shipment_term', '')
+        if shipment_term:
+            shipping_data.append([f"Shipment Term: {shipment_term}"])
+        
+        if len(shipping_data) > 1:  # 如果有内容才显示
+            shipping_table = Table(shipping_data, colWidths=[16*cm])
+            shipping_table.setStyle(TableStyle([
+                ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#e8e8e8')),
+                ('TEXTCOLOR', (0, 0), (-1, 0), colors.black),
+                ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+                ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+                ('FONTSIZE', (0, 0), (-1, 0), 11),
+                ('BOTTOMPADDING', (0, 0), (-1, 0), 8),
+                ('BACKGROUND', (0, 1), (-1, -1), colors.white),
+                ('FONTNAME', (0, 1), (-1, -1), 'Helvetica'),
+                ('FONTSIZE', (0, 1), (-1, -1), 9),
+                ('GRID', (0, 0), (-1, -1), 1, colors.grey),
+                ('VALIGN', (0, 0), (-1, -1), 'TOP'),
+            ]))
+            
+            self.story.append(shipping_table)
+            self.story.append(Spacer(1, 0.3*cm))
+    
+    def add_items(self, items: List[Dict[str, any]], product_description: Optional[str] = None):
         """
         添加发票项目列表
         
         Args:
             items: 项目列表，每个项目包含 {
-                'product_number': '', 'item_number': '', 'hs_code': '', 
+                'product_name': '', 'product_number': '', 'item_number': '', 'hs_code': '', 
                 'description': '', 'quantity': 0, 'unit_price': 0, 'amount': 0
             }
+            product_description: 产品总体描述（可选）
         """
-        # 表头
-        table_data = [['No.', 'Product Number', 'Item Number', 'HS Code', 'Description', 'Quantity', 'Unit Price', 'Amount']]
+        # 如果有产品总体描述，先添加
+        if product_description:
+            desc_style = ParagraphStyle(
+                'ProductDescription',
+                parent=self.styles['Normal'],
+                fontSize=10,
+                textColor=colors.HexColor('#333333'),
+                spaceAfter=8
+            )
+            desc_para = Paragraph(f"<b>Product Description (overall):</b> {product_description}", desc_style)
+            self.story.append(desc_para)
+            self.story.append(Spacer(1, 0.2*cm))
+        
+        # 表头 - 添加Product Name列
+        table_data = [['No.', 'Product Name', 'Product Number', 'Item Number', 'HS Code', 'Quantity', 'Unit Price (CNY)', 'Amount (CNY)']]
         
         # 添加项目数据
         total_amount = 0
+        total_quantity = 0
         for idx, item in enumerate(items, 1):
+            product_name = item.get('product_name', '')
             product_number = item.get('product_number', '')
             item_number = item.get('item_number', '')
             hs_code = item.get('hs_code', '')
             description = item.get('description', '')
+            # 如果没有product_name，使用description
+            if not product_name:
+                product_name = description
             quantity = item.get('quantity', 0)
             unit_price = item.get('unit_price', 0)
             amount = item.get('amount', quantity * unit_price)
             total_amount += amount
+            total_quantity += quantity
             
             table_data.append([
                 str(idx),
+                product_name,
                 product_number,
                 item_number,
                 hs_code,
-                description,
-                f"{quantity:.2f}",
-                f"${unit_price:.2f}",
-                f"${amount:.2f}"
+                f"{quantity:.0f}",
+                f"CNY {unit_price:.2f}",
+                f"CNY {amount:,.2f}"
             ])
         
-        # 创建表格 - 调整列宽以适应新列
+        # 创建表格 - 调整列宽以适应新列（包含Product Name）
         # A4宽度21cm，减去左右边距3cm，可用宽度18cm
-        # 列宽分配：No.(0.7) + Product No.(1.3) + Item No.(1.3) + HS Code(1.3) + Description(3.0) + Quantity(1.0) + Unit Price(1.4) + Amount(1.4) = 12.4cm
+        # 列宽分配：No.(0.6) + Product Name(2.5) + Product No.(1.2) + Item No.(1.2) + HS Code(1.2) + Quantity(0.9) + Unit Price(1.3) + Amount(1.3) = 11.2cm
         items_table = Table(
             table_data,
-            colWidths=[0.7*cm, 1.3*cm, 1.3*cm, 1.3*cm, 3.0*cm, 1.0*cm, 1.4*cm, 1.4*cm]
+            colWidths=[0.6*cm, 2.5*cm, 1.2*cm, 1.2*cm, 1.2*cm, 0.9*cm, 1.3*cm, 1.3*cm]
         )
         
         # 设置表格样式
@@ -274,17 +420,18 @@ class InvoiceGenerator:
             ('FONTSIZE', (0, 1), (-1, -1), 8),
             ('GRID', (0, 0), (-1, -1), 1, colors.grey),
             ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
-            ('ALIGN', (1, 1), (4, -1), 'LEFT'),  # Product Number, Item Number, HS Code, Description 左对齐
-            ('ALIGN', (5, 1), (7, -1), 'CENTER'),  # Quantity, Unit Price, Amount 居中
+            ('ALIGN', (1, 1), (4, -1), 'LEFT'),  # Product Name, Product Number, Item Number, HS Code 左对齐
+            ('ALIGN', (5, 1), (5, -1), 'CENTER'),  # Quantity 居中
+            ('ALIGN', (6, 1), (7, -1), 'RIGHT'),  # Unit Price, Amount 右对齐
         ]))
         
         self.story.append(items_table)
         self.story.append(Spacer(1, 0.3*cm))
         
-        # 添加总计
-        self.add_total(total_amount)
+        # 添加总计（包含总数量）
+        self.add_total(total_amount, total_quantity=total_quantity)
     
-    def add_total(self, subtotal: float, tax_rate: float = 0.0, discount: float = 0.0):
+    def add_total(self, subtotal: float, tax_rate: float = 0.0, discount: float = 0.0, total_quantity: float = 0.0):
         """
         添加总计信息
         
@@ -292,31 +439,40 @@ class InvoiceGenerator:
             subtotal: 小计金额
             tax_rate: 税率（百分比，如 13 表示 13%）
             discount: 折扣金额
+            total_quantity: 总数量
         """
         tax_amount = subtotal * (tax_rate / 100) if tax_rate > 0 else 0
         total = subtotal - discount + tax_amount
         
-        total_data = [
-            ['', '', '', '', '', '', 'Subtotal:', f"${subtotal:.2f}"],
-            ['', '', '', '', '', '', 'Discount:', f"-${discount:.2f}"],
-            ['', '', '', '', '', '', 'Tax:', f"${tax_amount:.2f}"],
-            ['', '', '', '', '', '', '<b>Total:</b>', f"<b>${total:.2f}</b>"],
-        ]
+        total_data = []
+        
+        # 如果有总数量，先显示总数量
+        if total_quantity > 0:
+            total_data.append(['', '', '', '', '', f"<b>Total Quantity:</b> {total_quantity:.0f}", '', ''])
+        
+        total_data.extend([
+            ['', '', '', '', '', '', 'Subtotal:', f"CNY {subtotal:,.2f}"],
+            ['', '', '', '', '', '', 'Discount:', f"-CNY {discount:,.2f}"],
+            ['', '', '', '', '', '', 'Tax:', f"CNY {tax_amount:,.2f}"],
+            ['', '', '', '', '', '', '<b>Total Amount (CNY):</b>', f"<b>CNY {total:,.2f}</b>"],
+        ])
         
         total_table = Table(
             total_data,
-            colWidths=[0.7*cm, 1.3*cm, 1.3*cm, 1.3*cm, 3.0*cm, 1.0*cm, 1.4*cm, 1.4*cm]
+            colWidths=[0.6*cm, 2.5*cm, 1.2*cm, 1.2*cm, 1.2*cm, 0.9*cm, 1.3*cm, 1.3*cm]
         )
         
         total_table.setStyle(TableStyle([
-            ('ALIGN', (6, 0), (-1, -1), 'RIGHT'),
-            ('FONTNAME', (6, 0), (-1, -1), 'Helvetica'),
-            ('FONTSIZE', (6, 0), (-1, -1), 10),
-            ('FONTNAME', (6, 3), (-1, -1), 'Helvetica-Bold'),
-            ('FONTSIZE', (6, 3), (-1, -1), 11),
-            ('TEXTCOLOR', (6, 3), (-1, -1), colors.HexColor('#d32f2f')),
-            ('LINEABOVE', (6, 0), (-1, 0), 1, colors.grey),
-            ('LINEBELOW', (6, 3), (-1, 3), 2, colors.HexColor('#d32f2f')),
+            ('ALIGN', (5, 0), (5, 0), 'RIGHT'),  # Total Quantity 右对齐
+            ('ALIGN', (6, 1), (-1, -1), 'RIGHT'),  # 金额列右对齐
+            ('FONTNAME', (6, 1), (-1, -2), 'Helvetica'),
+            ('FONTSIZE', (6, 1), (-1, -2), 10),
+            ('FONTNAME', (5, 0), (5, 0), 'Helvetica-Bold'),
+            ('FONTNAME', (6, 4), (-1, 4), 'Helvetica-Bold'),
+            ('FONTSIZE', (6, 4), (-1, 4), 11),
+            ('TEXTCOLOR', (6, 4), (-1, 4), colors.HexColor('#d32f2f')),
+            ('LINEABOVE', (6, 1), (-1, 1), 1, colors.grey),
+            ('LINEBELOW', (6, 4), (-1, 4), 2, colors.HexColor('#d32f2f')),
         ]))
         
         self.story.append(total_table)
@@ -408,37 +564,56 @@ def create_invoice(
     notes: Optional[str] = None,
     payment_info: Optional[Dict[str, str]] = None,
     logo_path: Optional[str] = None,
-    stamp_path: Optional[str] = None
+    stamp_path: Optional[str] = None,
+    shipper_info: Optional[Dict[str, str]] = None,
+    shipping_info: Optional[Dict[str, str]] = None,
+    product_description: Optional[str] = None
 ) -> str:
     """
     创建发票的便捷函数
     
     Args:
         output_path: 输出PDF文件路径
-        company_info: 公司信息
-        customer_info: 客户信息
-        invoice_info: 发票信息
-        items: 项目列表
+        company_info: 公司信息（Issuer）
+        customer_info: 客户信息（Consignee/Buyer）
+        invoice_info: 发票信息（包含 po_number）
+        items: 项目列表（包含 product_name）
         tax_rate: 税率（百分比）
         discount: 折扣金额
         notes: 备注
         payment_info: 支付信息
         logo_path: 公司Logo图片路径（可选）
         stamp_path: 图章图片路径（可选）
+        shipper_info: 发货方信息（可选）
+        shipping_info: 运输详情（可选）
+        product_description: 产品总体描述（可选）
     
     Returns:
         生成的PDF文件路径
     """
     generator = InvoiceGenerator(output_path)
     generator.add_header(company_info, invoice_info, logo_path)
-    generator.add_customer_info(customer_info)
-    generator.add_items(items)
     
-    # 计算小计
+    # 添加发货方信息
+    if shipper_info:
+        generator.add_shipper_info(shipper_info)
+    
+    # 添加收货方/买方信息
+    generator.add_customer_info(customer_info)
+    
+    # 添加运输详情
+    if shipping_info:
+        generator.add_shipping_details(shipping_info)
+    
+    # 添加产品项目和描述
+    generator.add_items(items, product_description=product_description)
+    
+    # 计算小计和总数量
     subtotal = sum(item.get('amount', item.get('quantity', 0) * item.get('unit_price', 0)) 
                    for item in items)
+    total_quantity = sum(item.get('quantity', 0) for item in items)
     
-    generator.add_total(subtotal, tax_rate, discount)
+    generator.add_total(subtotal, tax_rate, discount, total_quantity=total_quantity)
     generator.add_footer(notes, payment_info, stamp_path)
     generator.generate()
     

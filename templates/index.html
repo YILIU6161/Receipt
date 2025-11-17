@@ -43,29 +43,80 @@
                 </div>
             </section>
 
-            <!-- 客户信息 -->
+            <!-- 收货方/买方信息 -->
             <section class="form-section">
-                <h2>收票方信息</h2>
+                <h2>Consignee/Buyer Information</h2>
                 <div class="form-grid">
                     <div class="form-group">
-                        <label for="customer_name">客户名称 <span class="required">*</span></label>
+                        <label for="customer_name">Company Name <span class="required">*</span></label>
                         <input type="text" id="customer_name" name="customer_name" required>
                     </div>
                     <div class="form-group">
-                        <label for="customer_address">客户地址 <span class="required">*</span></label>
-                        <input type="text" id="customer_address" name="customer_address" required>
+                        <label for="plant_address">Plant Address</label>
+                        <input type="text" id="plant_address" name="plant_address">
                     </div>
                     <div class="form-group">
-                        <label for="customer_phone">联系电话</label>
+                        <label for="pin">Pin</label>
+                        <input type="text" id="pin" name="pin">
+                    </div>
+                    <div class="form-group">
+                        <label for="state_code">CHAKAN State Code</label>
+                        <input type="text" id="state_code" name="state_code">
+                    </div>
+                    <div class="form-group full-width">
+                        <label for="registered_address">Registered Office Address</label>
+                        <input type="text" id="registered_address" name="registered_address">
+                    </div>
+                    <div class="form-group">
+                        <label for="pan_no">Company PAN NO.</label>
+                        <input type="text" id="pan_no" name="pan_no">
+                    </div>
+                    <div class="form-group">
+                        <label for="gst_no">Company GST NO.MAHARASHTRA</label>
+                        <input type="text" id="gst_no" name="gst_no">
+                    </div>
+                    <div class="form-group">
+                        <label for="iec_no">IEC No.</label>
+                        <input type="text" id="iec_no" name="iec_no">
+                    </div>
+                    <div class="form-group">
+                        <label for="customer_address">Address</label>
+                        <input type="text" id="customer_address" name="customer_address">
+                    </div>
+                    <div class="form-group">
+                        <label for="customer_phone">Phone</label>
                         <input type="text" id="customer_phone" name="customer_phone">
                     </div>
                     <div class="form-group">
-                        <label for="customer_email">邮箱地址</label>
+                        <label for="customer_email">Email</label>
                         <input type="email" id="customer_email" name="customer_email">
                     </div>
-                    <div class="form-group full-width">
-                        <label for="customer_other">其他内容（可选）</label>
-                        <input type="text" id="customer_other" name="customer_other" placeholder="可输入其他相关信息">
+                </div>
+            </section>
+
+            <!-- 运输详情 -->
+            <section class="form-section">
+                <h2>Shipping Details (Optional)</h2>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="port_of_shipment">Port of Shipment</label>
+                        <input type="text" id="port_of_shipment" name="port_of_shipment">
+                    </div>
+                    <div class="form-group">
+                        <label for="country_of_origin">Country of Origin</label>
+                        <input type="text" id="country_of_origin" name="country_of_origin">
+                    </div>
+                    <div class="form-group">
+                        <label for="port_of_destination">Port of Destination</label>
+                        <input type="text" id="port_of_destination" name="port_of_destination">
+                    </div>
+                    <div class="form-group">
+                        <label for="place_of_destination">Place of Final Destination</label>
+                        <input type="text" id="place_of_destination" name="place_of_destination">
+                    </div>
+                    <div class="form-group">
+                        <label for="shipment_term">Shipment Term</label>
+                        <input type="text" id="shipment_term" name="shipment_term" placeholder="e.g., EXW, FOB, CIF">
                     </div>
                 </div>
             </section>
@@ -75,28 +126,60 @@
                 <h2>发票信息</h2>
                 <div class="form-grid">
                     <div class="form-group">
-                        <label for="invoice_number">发票号码 <span class="required">*</span></label>
+                        <label for="invoice_number">Invoice No. <span class="required">*</span></label>
                         <input type="text" id="invoice_number" name="invoice_number" required>
                     </div>
                     <div class="form-group">
-                        <label for="invoice_date">开票日期 <span class="required">*</span></label>
+                        <label for="invoice_date">Date <span class="required">*</span></label>
                         <input type="date" id="invoice_date" name="invoice_date" required>
                     </div>
                     <div class="form-group">
-                        <label for="due_date">到期日期 <span class="required">*</span></label>
-                        <input type="date" id="due_date" name="due_date" required>
+                        <label for="po_number">Purchase Order No.</label>
+                        <input type="text" id="po_number" name="po_number">
                     </div>
+                </div>
+            </section>
+
+            <!-- 发货方信息 -->
+            <section class="form-section">
+                <h2>Shipper Information (Optional)</h2>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="shipper_name">Shipper Name</label>
+                        <input type="text" id="shipper_name" name="shipper_name">
+                    </div>
+                    <div class="form-group">
+                        <label for="shipper_address">Shipper Address</label>
+                        <input type="text" id="shipper_address" name="shipper_address">
+                    </div>
+                    <div class="form-group">
+                        <label for="shipper_phone">Shipper Phone</label>
+                        <input type="text" id="shipper_phone" name="shipper_phone">
+                    </div>
+                </div>
+            </section>
+
+            <!-- 产品总体描述 -->
+            <section class="form-section">
+                <h2>Product Description (Optional)</h2>
+                <div class="form-group">
+                    <label for="product_description">Product Description (overall)</label>
+                    <input type="text" id="product_description" name="product_description" placeholder="e.g., Sensor assembly for bearings and parts">
                 </div>
             </section>
 
             <!-- 发票项目 -->
             <section class="form-section">
                 <div class="section-header">
-                    <h2>发票项目</h2>
-                    <button type="button" class="btn btn-secondary" id="addItemBtn">+ 添加项目</button>
+                    <h2>Invoice Items</h2>
+                    <button type="button" class="btn btn-secondary" id="addItemBtn">+ Add Item</button>
                 </div>
                 <div id="itemsContainer">
                     <div class="item-row" data-item-index="0">
+                        <div class="form-group">
+                            <label>Product Name</label>
+                            <input type="text" name="item_product_name_0">
+                        </div>
                         <div class="form-group">
                             <label>Product Number</label>
                             <input type="text" name="item_product_number_0">
@@ -118,16 +201,16 @@
                             <input type="number" name="item_quantity_0" step="0.01" min="0" required>
                         </div>
                         <div class="form-group">
-                            <label>Unit Price <span class="required">*</span></label>
+                            <label>Unit Price (CNY) <span class="required">*</span></label>
                             <input type="number" name="item_unit_price_0" step="0.01" min="0" required>
                         </div>
                         <div class="form-group">
-                            <label>Amount</label>
+                            <label>Amount (CNY)</label>
                             <input type="number" name="item_amount_0" step="0.01" min="0" readonly>
                         </div>
                         <div class="form-group">
                             <label>&nbsp;</label>
-                            <button type="button" class="btn btn-danger btn-small remove-item" style="display:none;">删除</button>
+                            <button type="button" class="btn btn-danger btn-small remove-item" style="display:none;">Delete</button>
                         </div>
                     </div>
                 </div>
@@ -225,12 +308,8 @@
         // 设置默认日期
         document.addEventListener('DOMContentLoaded', function() {
             const today = new Date().toISOString().split('T')[0];
-            const dueDate = new Date();
-            dueDate.setDate(dueDate.getDate() + 30);
-            const dueDateStr = dueDate.toISOString().split('T')[0];
             
             document.getElementById('invoice_date').value = today;
-            document.getElementById('due_date').value = dueDateStr;
 
             // 初始化项目计数
             let itemCount = 1;
@@ -243,6 +322,8 @@
                 const index = itemCount;
                 
                 newItem.setAttribute('data-item-index', index);
+                newItem.querySelector('input[name^="item_product_name"]').name = `item_product_name_${index}`;
+                newItem.querySelector('input[name^="item_product_name"]').value = '';
                 newItem.querySelector('input[name^="item_product_number"]').name = `item_product_number_${index}`;
                 newItem.querySelector('input[name^="item_product_number"]').value = '';
                 newItem.querySelector('input[name^="item_item_number"]').name = `item_item_number_${index}`;
