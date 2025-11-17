@@ -11,9 +11,19 @@ import uuid
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'your-secret-key-here'
 app.config['UPLOAD_FOLDER'] = 'generated_invoices'
+app.config['UPLOAD_IMAGES'] = 'uploaded_images'
+app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max file size
 
 # 确保输出目录存在
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
+os.makedirs(app.config['UPLOAD_IMAGES'], exist_ok=True)
+
+# 允许的图片扩展名
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'bmp', 'webp'}
+
+def allowed_file(filename):
+    """检查文件扩展名是否允许"""
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 
 @app.route('/')
@@ -28,6 +38,24 @@ def generate_invoice():
     try:
         # 获取表单数据
         data = request.form
+        
+        # 处理文件上传 - Logo
+        logo_path = None
+        if 'company_logo' in request.files:
+            logo_file = request.files['company_logo']
+            if logo_file and logo_file.filename and allowed_file(logo_file.filename):
+                logo_filename = f"logo_{uuid.uuid4().hex[:8]}_{logo_file.filename}"
+                logo_path = os.path.join(app.config['UPLOAD_IMAGES'], logo_filename)
+                logo_file.save(logo_path)
+        
+        # 处理文件上传 - 图章
+        stamp_path = None
+        if 'company_stamp' in request.files:
+            stamp_file = request.files['company_stamp']
+            if stamp_file and stamp_file.filename and allowed_file(stamp_file.filename):
+                stamp_filename = f"stamp_{uuid.uuid4().hex[:8]}_{stamp_file.filename}"
+                stamp_path = os.path.join(app.config['UPLOAD_IMAGES'], stamp_filename)
+                stamp_file.save(stamp_path)
         
         # 公司信息
         company_info = {
@@ -98,8 +126,22 @@ def generate_invoice():
             tax_rate=tax_rate,
             discount=discount,
             notes=notes if notes else None,
-            payment_info=payment_info
+            payment_info=payment_info,
+            logo_path=logo_path,
+            stamp_path=stamp_path
         )
+        
+        # 清理上传的临时图片文件
+        if logo_path and os.path.exists(logo_path):
+            try:
+                os.remove(logo_path)
+            except:
+                pass
+        if stamp_path and os.path.exists(stamp_path):
+            try:
+                os.remove(stamp_path)
+            except:
+                pass
         
         # 返回下载链接
         return jsonify({

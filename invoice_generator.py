@@ -47,41 +47,80 @@ class InvoiceGenerator:
         except:
             pass
     
-    def add_header(self, company_info: Dict[str, str], invoice_info: Dict[str, str]):
+    def add_header(self, company_info: Dict[str, str], invoice_info: Dict[str, str], logo_path: Optional[str] = None):
         """
         添加发票头部信息
         
         Args:
             company_info: 公司信息字典 {'name': '', 'address': '', 'phone': '', 'email': ''}
             invoice_info: 发票信息字典 {'number': '', 'date': '', 'due_date': ''}
+            logo_path: 公司Logo图片路径（可选）
         """
-        # 标题
-        title_style = ParagraphStyle(
-            'CustomTitle',
-            parent=self.styles['Heading1'],
-            fontSize=24,
-            textColor=colors.HexColor('#1a1a1a'),
-            spaceAfter=30,
-            alignment=1  # 居中
-        )
-        title = Paragraph("发票 / INVOICE", title_style)
-        self.story.append(title)
+        # 如果有Logo，创建带Logo的头部
+        if logo_path and os.path.exists(logo_path):
+            try:
+                logo_img = Image(logo_path, width=4*cm, height=4*cm)
+                logo_img.hAlign = 'LEFT'
+                
+                # 创建Logo和标题的布局
+                header_data = [
+                    [logo_img, Paragraph("INVOICE", ParagraphStyle(
+                        'CustomTitle',
+                        parent=self.styles['Heading1'],
+                        fontSize=24,
+                        textColor=colors.HexColor('#1a1a1a'),
+                        alignment=1  # 居中
+                    ))]
+                ]
+                header_table = Table(header_data, colWidths=[4*cm, 12*cm])
+                header_table.setStyle(TableStyle([
+                    ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+                    ('ALIGN', (0, 0), (0, 0), 'LEFT'),
+                    ('ALIGN', (1, 0), (1, 0), 'CENTER'),
+                ]))
+                self.story.append(header_table)
+            except Exception as e:
+                print(f"警告: 无法加载Logo图片: {e}")
+                # 如果Logo加载失败，使用默认标题
+                title_style = ParagraphStyle(
+                    'CustomTitle',
+                    parent=self.styles['Heading1'],
+                    fontSize=24,
+                    textColor=colors.HexColor('#1a1a1a'),
+                    spaceAfter=30,
+                    alignment=1  # 居中
+                )
+                title = Paragraph("INVOICE", title_style)
+                self.story.append(title)
+        else:
+            # 没有Logo时使用默认标题
+            title_style = ParagraphStyle(
+                'CustomTitle',
+                parent=self.styles['Heading1'],
+                fontSize=24,
+                textColor=colors.HexColor('#1a1a1a'),
+                spaceAfter=30,
+                alignment=1  # 居中
+            )
+            title = Paragraph("INVOICE", title_style)
+            self.story.append(title)
+        
         self.story.append(Spacer(1, 0.5*cm))
         
         # 创建两列布局：公司信息和发票信息
         company_data = [
-            ['<b>开票方信息</b>'],
-            [f"公司名称: {company_info.get('name', '')}"],
-            [f"地址: {company_info.get('address', '')}"],
-            [f"电话: {company_info.get('phone', '')}"],
-            [f"邮箱: {company_info.get('email', '')}"],
+            ['<b>Bill From</b>'],
+            [f"Company Name: {company_info.get('name', '')}"],
+            [f"Address: {company_info.get('address', '')}"],
+            [f"Phone: {company_info.get('phone', '')}"],
+            [f"Email: {company_info.get('email', '')}"],
         ]
         
         invoice_data = [
-            ['<b>发票信息</b>'],
-            [f"发票号码: {invoice_info.get('number', '')}"],
-            [f"开票日期: {invoice_info.get('date', '')}"],
-            [f"到期日期: {invoice_info.get('due_date', '')}"],
+            ['<b>Invoice Information</b>'],
+            [f"Invoice Number: {invoice_info.get('number', '')}"],
+            [f"Invoice Date: {invoice_info.get('date', '')}"],
+            [f"Due Date: {invoice_info.get('due_date', '')}"],
         ]
         
         # 创建表格
@@ -137,11 +176,11 @@ class InvoiceGenerator:
             customer_info: 客户信息字典 {'name': '', 'address': '', 'phone': '', 'email': ''}
         """
         customer_data = [
-            ['<b>收票方信息</b>'],
-            [f"客户名称: {customer_info.get('name', '')}"],
-            [f"地址: {customer_info.get('address', '')}"],
-            [f"电话: {customer_info.get('phone', '')}"],
-            [f"邮箱: {customer_info.get('email', '')}"],
+            ['<b>Bill To</b>'],
+            [f"Customer Name: {customer_info.get('name', '')}"],
+            [f"Address: {customer_info.get('address', '')}"],
+            [f"Phone: {customer_info.get('phone', '')}"],
+            [f"Email: {customer_info.get('email', '')}"],
         ]
         
         customer_table = Table(customer_data, colWidths=[16*cm])
@@ -170,7 +209,7 @@ class InvoiceGenerator:
             items: 项目列表，每个项目包含 {'description': '', 'quantity': 0, 'unit_price': 0, 'amount': 0}
         """
         # 表头
-        table_data = [['序号', '项目描述', '数量', '单价', '金额']]
+        table_data = [['No.', 'Description', 'Quantity', 'Unit Price', 'Amount']]
         
         # 添加项目数据
         total_amount = 0
@@ -185,8 +224,8 @@ class InvoiceGenerator:
                 str(idx),
                 description,
                 f"{quantity:.2f}",
-                f"¥{unit_price:.2f}",
-                f"¥{amount:.2f}"
+                f"${unit_price:.2f}",
+                f"${amount:.2f}"
             ])
         
         # 创建表格
@@ -235,10 +274,10 @@ class InvoiceGenerator:
         total = subtotal - discount + tax_amount
         
         total_data = [
-            ['', '', '', '小计:', f"¥{subtotal:.2f}"],
-            ['', '', '', '折扣:', f"-¥{discount:.2f}"],
-            ['', '', '', '税费:', f"¥{tax_amount:.2f}"],
-            ['', '', '', '<b>总计:</b>', f"<b>¥{total:.2f}</b>"],
+            ['', '', '', 'Subtotal:', f"${subtotal:.2f}"],
+            ['', '', '', 'Discount:', f"-${discount:.2f}"],
+            ['', '', '', 'Tax:', f"${tax_amount:.2f}"],
+            ['', '', '', '<b>Total:</b>', f"<b>${total:.2f}</b>"],
         ]
         
         total_table = Table(
@@ -260,13 +299,14 @@ class InvoiceGenerator:
         self.story.append(total_table)
         self.story.append(Spacer(1, 1*cm))
     
-    def add_footer(self, notes: Optional[str] = None, payment_info: Optional[Dict[str, str]] = None):
+    def add_footer(self, notes: Optional[str] = None, payment_info: Optional[Dict[str, str]] = None, stamp_path: Optional[str] = None):
         """
         添加发票底部信息
         
         Args:
             notes: 备注信息
             payment_info: 支付信息字典 {'bank': '', 'account': '', 'swift': ''}
+            stamp_path: 图章图片路径（可选）
         """
         if notes:
             notes_style = ParagraphStyle(
@@ -276,15 +316,15 @@ class InvoiceGenerator:
                 textColor=colors.HexColor('#666666'),
                 spaceAfter=10
             )
-            notes_para = Paragraph(f"<b>备注:</b> {notes}", notes_style)
+            notes_para = Paragraph(f"<b>Notes:</b> {notes}", notes_style)
             self.story.append(notes_para)
             self.story.append(Spacer(1, 0.5*cm))
         
         if payment_info:
             payment_data = [
-                ['<b>支付信息</b>'],
-                [f"银行: {payment_info.get('bank', '')}"],
-                [f"账户: {payment_info.get('account', '')}"],
+                ['<b>Payment Information</b>'],
+                [f"Bank: {payment_info.get('bank', '')}"],
+                [f"Account: {payment_info.get('account', '')}"],
                 [f"SWIFT: {payment_info.get('swift', '')}"],
             ]
             
@@ -306,19 +346,50 @@ class InvoiceGenerator:
             self.story.append(payment_table)
             self.story.append(Spacer(1, 0.5*cm))
         
-        # 添加签名区域
-        signature_data = [
-            ['', ''],
-            ['开票人签名: _______________', '客户签名: _______________'],
-        ]
-        
-        signature_table = Table(signature_data, colWidths=[8*cm, 8*cm])
-        signature_table.setStyle(TableStyle([
-            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
-            ('FONTNAME', (0, 1), (-1, -1), 'Helvetica'),
-            ('FONTSIZE', (0, 1), (-1, -1), 10),
-            ('VALIGN', (0, 0), (-1, -1), 'TOP'),
-        ]))
+        # 添加签名区域和图章
+        if stamp_path and os.path.exists(stamp_path):
+            try:
+                # 如果有图章，在签名区域右侧显示图章
+                stamp_img = Image(stamp_path, width=3*cm, height=3*cm)
+                signature_data = [
+                    ['Issuer Signature: _______________', stamp_img],
+                    ['Customer Signature: _______________', ''],
+                ]
+                signature_table = Table(signature_data, colWidths=[8*cm, 8*cm])
+                signature_table.setStyle(TableStyle([
+                    ('ALIGN', (0, 0), (0, -1), 'LEFT'),
+                    ('ALIGN', (1, 0), (1, 0), 'RIGHT'),
+                    ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+                    ('FONTNAME', (0, 0), (0, -1), 'Helvetica'),
+                    ('FONTSIZE', (0, 0), (0, -1), 10),
+                ]))
+            except Exception as e:
+                print(f"警告: 无法加载图章图片: {e}")
+                # 如果图章加载失败，使用默认签名区域
+                signature_data = [
+                    ['', ''],
+                    ['Issuer Signature: _______________', 'Customer Signature: _______________'],
+                ]
+                signature_table = Table(signature_data, colWidths=[8*cm, 8*cm])
+                signature_table.setStyle(TableStyle([
+                    ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+                    ('FONTNAME', (0, 1), (-1, -1), 'Helvetica'),
+                    ('FONTSIZE', (0, 1), (-1, -1), 10),
+                    ('VALIGN', (0, 0), (-1, -1), 'TOP'),
+                ]))
+        else:
+            # 没有图章时使用默认签名区域
+            signature_data = [
+                ['', ''],
+                ['Issuer Signature: _______________', 'Customer Signature: _______________'],
+            ]
+            signature_table = Table(signature_data, colWidths=[8*cm, 8*cm])
+            signature_table.setStyle(TableStyle([
+                ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+                ('FONTNAME', (0, 1), (-1, -1), 'Helvetica'),
+                ('FONTSIZE', (0, 1), (-1, -1), 10),
+                ('VALIGN', (0, 0), (-1, -1), 'TOP'),
+            ]))
         
         self.story.append(Spacer(1, 1*cm))
         self.story.append(signature_table)
@@ -338,7 +409,9 @@ def create_invoice(
     tax_rate: float = 0.0,
     discount: float = 0.0,
     notes: Optional[str] = None,
-    payment_info: Optional[Dict[str, str]] = None
+    payment_info: Optional[Dict[str, str]] = None,
+    logo_path: Optional[str] = None,
+    stamp_path: Optional[str] = None
 ) -> str:
     """
     创建发票的便捷函数
@@ -353,12 +426,14 @@ def create_invoice(
         discount: 折扣金额
         notes: 备注
         payment_info: 支付信息
+        logo_path: 公司Logo图片路径（可选）
+        stamp_path: 图章图片路径（可选）
     
     Returns:
         生成的PDF文件路径
     """
     generator = InvoiceGenerator(output_path)
-    generator.add_header(company_info, invoice_info)
+    generator.add_header(company_info, invoice_info, logo_path)
     generator.add_customer_info(customer_info)
     generator.add_items(items)
     
@@ -367,7 +442,7 @@ def create_invoice(
                    for item in items)
     
     generator.add_total(subtotal, tax_rate, discount)
-    generator.add_footer(notes, payment_info)
+    generator.add_footer(notes, payment_info, stamp_path)
     generator.generate()
     
     return output_path

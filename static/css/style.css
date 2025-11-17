@@ -123,6 +123,52 @@ header h1 {
     min-height: 80px;
 }
 
+.form-group.full-width {
+    grid-column: 1 / -1;
+}
+
+.form-group input[type="file"] {
+    padding: 8px;
+    border: 2px dashed #dee2e6;
+    border-radius: 6px;
+    background-color: #f8f9fa;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.form-group input[type="file"]:hover {
+    border-color: #667eea;
+    background-color: #f0f0f0;
+}
+
+.form-group input[type="file"]:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.file-hint {
+    display: block;
+    margin-top: 5px;
+    font-size: 0.85em;
+    color: #6c757d;
+    font-style: italic;
+}
+
+.image-preview {
+    margin-top: 10px;
+}
+
+.image-preview img {
+    max-width: 200px;
+    max-height: 200px;
+    border: 2px solid #dee2e6;
+    border-radius: 6px;
+    padding: 5px;
+    background: white;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
 /* 项目行 */
 .item-row {
     display: grid;

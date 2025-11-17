@@ -26,6 +26,7 @@ wheels/
 # PDF文件
 *.pdf
 generated_invoices/
+uploaded_images/
 
 # IDE
 .vscode/
