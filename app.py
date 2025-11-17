@@ -110,7 +110,8 @@ def generate_invoice():
             'name': data.get('customer_name', ''),
             'address': data.get('customer_address', ''),
             'phone': data.get('customer_phone', ''),
-            'email': data.get('customer_email', '')
+            'email': data.get('customer_email', ''),
+            'other': data.get('customer_other', '')
         }
         
         # 发票信息

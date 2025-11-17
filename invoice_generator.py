@@ -179,7 +179,7 @@ class InvoiceGenerator:
         添加客户信息
         
         Args:
-            customer_info: 客户信息字典 {'name': '', 'address': '', 'phone': '', 'email': ''}
+            customer_info: 客户信息字典 {'name': '', 'address': '', 'phone': '', 'email': '', 'other': ''}
         """
         customer_data = [
             ['<b>Bill To</b>'],
@@ -188,6 +188,11 @@ class InvoiceGenerator:
             [f"Phone: {customer_info.get('phone', '')}"],
             [f"Email: {customer_info.get('email', '')}"],
         ]
+        
+        # 如果有其他内容，添加到列表中
+        other = customer_info.get('other', '')
+        if other:
+            customer_data.append([f"Other: {other}"])
         
         customer_table = Table(customer_data, colWidths=[16*cm])
         customer_table.setStyle(TableStyle([
@@ -244,9 +249,11 @@ class InvoiceGenerator:
             ])
         
         # 创建表格 - 调整列宽以适应新列
+        # A4宽度21cm，减去左右边距3cm，可用宽度18cm
+        # 列宽分配：No.(0.7) + Product No.(1.3) + Item No.(1.3) + HS Code(1.3) + Description(3.0) + Quantity(1.0) + Unit Price(1.4) + Amount(1.4) = 12.4cm
         items_table = Table(
             table_data,
-            colWidths=[1*cm, 2*cm, 2*cm, 2*cm, 4*cm, 1.5*cm, 2*cm, 1.5*cm]
+            colWidths=[0.7*cm, 1.3*cm, 1.3*cm, 1.3*cm, 3.0*cm, 1.0*cm, 1.4*cm, 1.4*cm]
         )
         
         # 设置表格样式
@@ -256,15 +263,15 @@ class InvoiceGenerator:
             ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
             ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
             ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
-            ('FONTSIZE', (0, 0), (-1, 0), 11),
-            ('BOTTOMPADDING', (0, 0), (-1, 0), 8),
-            ('TOPPADDING', (0, 0), (-1, 0), 8),
+            ('FONTSIZE', (0, 0), (-1, 0), 10),
+            ('BOTTOMPADDING', (0, 0), (-1, 0), 6),
+            ('TOPPADDING', (0, 0), (-1, 0), 6),
             
             # 数据行样式
             ('BACKGROUND', (0, 1), (-1, -1), colors.white),
             ('TEXTCOLOR', (0, 1), (-1, -1), colors.black),
             ('FONTNAME', (0, 1), (-1, -1), 'Helvetica'),
-            ('FONTSIZE', (0, 1), (-1, -1), 9),
+            ('FONTSIZE', (0, 1), (-1, -1), 8),
             ('GRID', (0, 0), (-1, -1), 1, colors.grey),
             ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
             ('ALIGN', (1, 1), (4, -1), 'LEFT'),  # Product Number, Item Number, HS Code, Description 左对齐
@@ -298,7 +305,7 @@ class InvoiceGenerator:
         
         total_table = Table(
             total_data,
-            colWidths=[1*cm, 2*cm, 2*cm, 2*cm, 4*cm, 1.5*cm, 2*cm, 1.5*cm]
+            colWidths=[0.7*cm, 1.3*cm, 1.3*cm, 1.3*cm, 3.0*cm, 1.0*cm, 1.4*cm, 1.4*cm]
         )
         
         total_table.setStyle(TableStyle([
