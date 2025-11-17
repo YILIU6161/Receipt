@@ -127,11 +127,17 @@ def generate_invoice():
         for i in range(item_count):
             description = data.get(f'item_description_{i}', '')
             if description:  # 只添加非空项目
+                product_number = data.get(f'item_product_number_{i}', '')
+                item_number = data.get(f'item_item_number_{i}', '')
+                hs_code = data.get(f'item_hs_code_{i}', '')
                 quantity = float(data.get(f'item_quantity_{i}', 0) or 0)
                 unit_price = float(data.get(f'item_unit_price_{i}', 0) or 0)
                 amount = float(data.get(f'item_amount_{i}', 0) or (quantity * unit_price))
                 
                 items.append({
+                    'product_number': product_number,
+                    'item_number': item_number,
+                    'hs_code': hs_code,
                     'description': description,
                     'quantity': quantity,
                     'unit_price': unit_price,

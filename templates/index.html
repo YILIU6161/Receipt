@@ -94,19 +94,31 @@
                 <div id="itemsContainer">
                     <div class="item-row" data-item-index="0">
                         <div class="form-group">
-                            <label>项目描述 <span class="required">*</span></label>
+                            <label>Product Number</label>
+                            <input type="text" name="item_product_number_0">
+                        </div>
+                        <div class="form-group">
+                            <label>Item Number</label>
+                            <input type="text" name="item_item_number_0">
+                        </div>
+                        <div class="form-group">
+                            <label>HS Code</label>
+                            <input type="text" name="item_hs_code_0">
+                        </div>
+                        <div class="form-group">
+                            <label>Description <span class="required">*</span></label>
                             <input type="text" name="item_description_0" required>
                         </div>
                         <div class="form-group">
-                            <label>数量 <span class="required">*</span></label>
+                            <label>Quantity <span class="required">*</span></label>
                             <input type="number" name="item_quantity_0" step="0.01" min="0" required>
                         </div>
                         <div class="form-group">
-                            <label>单价 <span class="required">*</span></label>
+                            <label>Unit Price <span class="required">*</span></label>
                             <input type="number" name="item_unit_price_0" step="0.01" min="0" required>
                         </div>
                         <div class="form-group">
-                            <label>金额</label>
+                            <label>Amount</label>
                             <input type="number" name="item_amount_0" step="0.01" min="0" readonly>
                         </div>
                         <div class="form-group">
@@ -166,7 +178,7 @@
                 <div class="form-group">
                     <label for="company_stamp">图章图片</label>
                     <input type="file" id="company_stamp" name="company_stamp" accept="image/*">
-                    <small class="file-hint">支持 PNG, JPG, JPEG, GIF, BMP, WEBP 格式，建议尺寸 200x200px 或更大，将显示在签名区域</small>
+                    <small class="file-hint">支持 PNG, JPG, JPEG, GIF, BMP, WEBP 格式，建议尺寸 200x200px 或更大，将显示在发票底部</small>
                     <div id="stamp-preview" class="image-preview"></div>
                 </div>
             </section>
@@ -227,6 +239,12 @@
                 const index = itemCount;
                 
                 newItem.setAttribute('data-item-index', index);
+                newItem.querySelector('input[name^="item_product_number"]').name = `item_product_number_${index}`;
+                newItem.querySelector('input[name^="item_product_number"]').value = '';
+                newItem.querySelector('input[name^="item_item_number"]').name = `item_item_number_${index}`;
+                newItem.querySelector('input[name^="item_item_number"]').value = '';
+                newItem.querySelector('input[name^="item_hs_code"]').name = `item_hs_code_${index}`;
+                newItem.querySelector('input[name^="item_hs_code"]').value = '';
                 newItem.querySelector('input[name^="item_description"]').name = `item_description_${index}`;
                 newItem.querySelector('input[name^="item_description"]').value = '';
                 newItem.querySelector('input[name^="item_quantity"]').name = `item_quantity_${index}`;

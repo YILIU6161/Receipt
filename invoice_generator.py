@@ -27,10 +27,10 @@ class InvoiceGenerator:
         self.doc = SimpleDocTemplate(
             output_path,
             pagesize=A4,
-            rightMargin=2*cm,
-            leftMargin=2*cm,
-            topMargin=2*cm,
-            bottomMargin=2*cm
+            rightMargin=1.5*cm,
+            leftMargin=1.5*cm,
+            topMargin=1.5*cm,
+            bottomMargin=1.5*cm
         )
         self.story = []
         self.styles = getSampleStyleSheet()
@@ -64,7 +64,7 @@ class InvoiceGenerator:
                 if not os.path.exists(abs_logo_path):
                     raise FileNotFoundError(f"Logo file not found: {abs_logo_path}")
                 
-                logo_img = Image(abs_logo_path, width=4*cm, height=4*cm)
+                logo_img = Image(abs_logo_path, width=3*cm, height=3*cm)
                 logo_img.hAlign = 'LEFT'
                 
                 # 创建Logo和标题的布局
@@ -72,7 +72,7 @@ class InvoiceGenerator:
                     [logo_img, Paragraph("INVOICE", ParagraphStyle(
                         'CustomTitle',
                         parent=self.styles['Heading1'],
-                        fontSize=24,
+                        fontSize=20,
                         textColor=colors.HexColor('#1a1a1a'),
                         alignment=1  # 居中
                     ))]
@@ -91,9 +91,9 @@ class InvoiceGenerator:
                 title_style = ParagraphStyle(
                     'CustomTitle',
                     parent=self.styles['Heading1'],
-                    fontSize=24,
+                    fontSize=20,
                     textColor=colors.HexColor('#1a1a1a'),
-                    spaceAfter=30,
+                    spaceAfter=20,
                     alignment=1  # 居中
                 )
                 title = Paragraph("INVOICE", title_style)
@@ -111,7 +111,7 @@ class InvoiceGenerator:
             title = Paragraph("INVOICE", title_style)
             self.story.append(title)
         
-        self.story.append(Spacer(1, 0.5*cm))
+        self.story.append(Spacer(1, 0.3*cm))
         
         # 创建两列布局：公司信息和发票信息
         company_data = [
@@ -139,11 +139,11 @@ class InvoiceGenerator:
             ('TEXTCOLOR', (0, 0), (-1, 0), colors.black),
             ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
             ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
-            ('FONTSIZE', (0, 0), (-1, 0), 12),
-            ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+            ('FONTSIZE', (0, 0), (-1, 0), 11),
+            ('BOTTOMPADDING', (0, 0), (-1, 0), 8),
             ('BACKGROUND', (0, 1), (-1, -1), colors.white),
             ('FONTNAME', (0, 1), (-1, -1), 'Helvetica'),
-            ('FONTSIZE', (0, 1), (-1, -1), 10),
+            ('FONTSIZE', (0, 1), (-1, -1), 9),
             ('GRID', (0, 0), (-1, -1), 1, colors.grey),
             ('VALIGN', (0, 0), (-1, -1), 'TOP'),
         ]))
@@ -153,11 +153,11 @@ class InvoiceGenerator:
             ('TEXTCOLOR', (0, 0), (-1, 0), colors.black),
             ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
             ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
-            ('FONTSIZE', (0, 0), (-1, 0), 12),
-            ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+            ('FONTSIZE', (0, 0), (-1, 0), 11),
+            ('BOTTOMPADDING', (0, 0), (-1, 0), 8),
             ('BACKGROUND', (0, 1), (-1, -1), colors.white),
             ('FONTNAME', (0, 1), (-1, -1), 'Helvetica'),
-            ('FONTSIZE', (0, 1), (-1, -1), 10),
+            ('FONTSIZE', (0, 1), (-1, -1), 9),
             ('GRID', (0, 0), (-1, -1), 1, colors.grey),
             ('VALIGN', (0, 0), (-1, -1), 'TOP'),
         ]))
@@ -172,7 +172,7 @@ class InvoiceGenerator:
         ]))
         
         self.story.append(combined_table)
-        self.story.append(Spacer(1, 1*cm))
+        self.story.append(Spacer(1, 0.5*cm))
     
     def add_customer_info(self, customer_info: Dict[str, str]):
         """
@@ -195,31 +195,37 @@ class InvoiceGenerator:
             ('TEXTCOLOR', (0, 0), (-1, 0), colors.black),
             ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
             ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
-            ('FONTSIZE', (0, 0), (-1, 0), 12),
-            ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+            ('FONTSIZE', (0, 0), (-1, 0), 11),
+            ('BOTTOMPADDING', (0, 0), (-1, 0), 8),
             ('BACKGROUND', (0, 1), (-1, -1), colors.white),
             ('FONTNAME', (0, 1), (-1, -1), 'Helvetica'),
-            ('FONTSIZE', (0, 1), (-1, -1), 10),
+            ('FONTSIZE', (0, 1), (-1, -1), 9),
             ('GRID', (0, 0), (-1, -1), 1, colors.grey),
             ('VALIGN', (0, 0), (-1, -1), 'TOP'),
         ]))
         
         self.story.append(customer_table)
-        self.story.append(Spacer(1, 1*cm))
+        self.story.append(Spacer(1, 0.5*cm))
     
     def add_items(self, items: List[Dict[str, any]]):
         """
         添加发票项目列表
         
         Args:
-            items: 项目列表，每个项目包含 {'description': '', 'quantity': 0, 'unit_price': 0, 'amount': 0}
+            items: 项目列表，每个项目包含 {
+                'product_number': '', 'item_number': '', 'hs_code': '', 
+                'description': '', 'quantity': 0, 'unit_price': 0, 'amount': 0
+            }
         """
         # 表头
-        table_data = [['No.', 'Description', 'Quantity', 'Unit Price', 'Amount']]
+        table_data = [['No.', 'Product Number', 'Item Number', 'HS Code', 'Description', 'Quantity', 'Unit Price', 'Amount']]
         
         # 添加项目数据
         total_amount = 0
         for idx, item in enumerate(items, 1):
+            product_number = item.get('product_number', '')
+            item_number = item.get('item_number', '')
+            hs_code = item.get('hs_code', '')
             description = item.get('description', '')
             quantity = item.get('quantity', 0)
             unit_price = item.get('unit_price', 0)
@@ -228,16 +234,19 @@ class InvoiceGenerator:
             
             table_data.append([
                 str(idx),
+                product_number,
+                item_number,
+                hs_code,
                 description,
                 f"{quantity:.2f}",
                 f"${unit_price:.2f}",
                 f"${amount:.2f}"
             ])
         
-        # 创建表格
+        # 创建表格 - 调整列宽以适应新列
         items_table = Table(
             table_data,
-            colWidths=[1.5*cm, 8*cm, 2*cm, 2.5*cm, 2*cm]
+            colWidths=[1*cm, 2*cm, 2*cm, 2*cm, 4*cm, 1.5*cm, 2*cm, 1.5*cm]
         )
         
         # 设置表格样式
@@ -247,22 +256,23 @@ class InvoiceGenerator:
             ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
             ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
             ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
-            ('FONTSIZE', (0, 0), (-1, 0), 12),
-            ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
-            ('TOPPADDING', (0, 0), (-1, 0), 12),
+            ('FONTSIZE', (0, 0), (-1, 0), 11),
+            ('BOTTOMPADDING', (0, 0), (-1, 0), 8),
+            ('TOPPADDING', (0, 0), (-1, 0), 8),
             
             # 数据行样式
             ('BACKGROUND', (0, 1), (-1, -1), colors.white),
             ('TEXTCOLOR', (0, 1), (-1, -1), colors.black),
             ('FONTNAME', (0, 1), (-1, -1), 'Helvetica'),
-            ('FONTSIZE', (0, 1), (-1, -1), 10),
+            ('FONTSIZE', (0, 1), (-1, -1), 9),
             ('GRID', (0, 0), (-1, -1), 1, colors.grey),
             ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
-            ('ALIGN', (1, 1), (1, -1), 'LEFT'),  # 描述左对齐
+            ('ALIGN', (1, 1), (4, -1), 'LEFT'),  # Product Number, Item Number, HS Code, Description 左对齐
+            ('ALIGN', (5, 1), (7, -1), 'CENTER'),  # Quantity, Unit Price, Amount 居中
         ]))
         
         self.story.append(items_table)
-        self.story.append(Spacer(1, 0.5*cm))
+        self.story.append(Spacer(1, 0.3*cm))
         
         # 添加总计
         self.add_total(total_amount)
@@ -280,30 +290,30 @@ class InvoiceGenerator:
         total = subtotal - discount + tax_amount
         
         total_data = [
-            ['', '', '', 'Subtotal:', f"${subtotal:.2f}"],
-            ['', '', '', 'Discount:', f"-${discount:.2f}"],
-            ['', '', '', 'Tax:', f"${tax_amount:.2f}"],
-            ['', '', '', '<b>Total:</b>', f"<b>${total:.2f}</b>"],
+            ['', '', '', '', '', '', 'Subtotal:', f"${subtotal:.2f}"],
+            ['', '', '', '', '', '', 'Discount:', f"-${discount:.2f}"],
+            ['', '', '', '', '', '', 'Tax:', f"${tax_amount:.2f}"],
+            ['', '', '', '', '', '', '<b>Total:</b>', f"<b>${total:.2f}</b>"],
         ]
         
         total_table = Table(
             total_data,
-            colWidths=[1.5*cm, 8*cm, 2*cm, 2.5*cm, 2*cm]
+            colWidths=[1*cm, 2*cm, 2*cm, 2*cm, 4*cm, 1.5*cm, 2*cm, 1.5*cm]
         )
         
         total_table.setStyle(TableStyle([
-            ('ALIGN', (3, 0), (-1, -1), 'RIGHT'),
-            ('FONTNAME', (3, 0), (-1, -1), 'Helvetica'),
-            ('FONTSIZE', (3, 0), (-1, -1), 11),
-            ('FONTNAME', (3, 3), (-1, -1), 'Helvetica-Bold'),
-            ('FONTSIZE', (3, 3), (-1, -1), 12),
-            ('TEXTCOLOR', (3, 3), (-1, -1), colors.HexColor('#d32f2f')),
-            ('LINEABOVE', (3, 0), (-1, 0), 1, colors.grey),
-            ('LINEBELOW', (3, 3), (-1, 3), 2, colors.HexColor('#d32f2f')),
+            ('ALIGN', (6, 0), (-1, -1), 'RIGHT'),
+            ('FONTNAME', (6, 0), (-1, -1), 'Helvetica'),
+            ('FONTSIZE', (6, 0), (-1, -1), 10),
+            ('FONTNAME', (6, 3), (-1, -1), 'Helvetica-Bold'),
+            ('FONTSIZE', (6, 3), (-1, -1), 11),
+            ('TEXTCOLOR', (6, 3), (-1, -1), colors.HexColor('#d32f2f')),
+            ('LINEABOVE', (6, 0), (-1, 0), 1, colors.grey),
+            ('LINEBELOW', (6, 3), (-1, 3), 2, colors.HexColor('#d32f2f')),
         ]))
         
         self.story.append(total_table)
-        self.story.append(Spacer(1, 1*cm))
+        self.story.append(Spacer(1, 0.3*cm))
     
     def add_footer(self, notes: Optional[str] = None, payment_info: Optional[Dict[str, str]] = None, stamp_path: Optional[str] = None):
         """
@@ -314,97 +324,65 @@ class InvoiceGenerator:
             payment_info: 支付信息字典 {'bank': '', 'account': '', 'swift': ''}
             stamp_path: 图章图片路径（可选）
         """
+        # 创建底部内容表格，包含备注、支付信息和图章
+        footer_rows = []
+        
+        # 备注和支付信息（左侧）
+        left_content = []
         if notes:
-            notes_style = ParagraphStyle(
-                'Notes',
-                parent=self.styles['Normal'],
-                fontSize=10,
-                textColor=colors.HexColor('#666666'),
-                spaceAfter=10
-            )
-            notes_para = Paragraph(f"<b>Notes:</b> {notes}", notes_style)
-            self.story.append(notes_para)
-            self.story.append(Spacer(1, 0.5*cm))
-        
+            left_content.append(f"<b>Notes:</b> {notes}")
         if payment_info:
-            payment_data = [
-                ['<b>Payment Information</b>'],
-                [f"Bank: {payment_info.get('bank', '')}"],
-                [f"Account: {payment_info.get('account', '')}"],
-                [f"SWIFT: {payment_info.get('swift', '')}"],
-            ]
-            
-            payment_table = Table(payment_data, colWidths=[16*cm])
-            payment_table.setStyle(TableStyle([
-                ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#f5f5f5')),
-                ('TEXTCOLOR', (0, 0), (-1, 0), colors.black),
-                ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
-                ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
-                ('FONTSIZE', (0, 0), (-1, 0), 11),
-                ('BOTTOMPADDING', (0, 0), (-1, 0), 10),
-                ('BACKGROUND', (0, 1), (-1, -1), colors.white),
-                ('FONTNAME', (0, 1), (-1, -1), 'Helvetica'),
-                ('FONTSIZE', (0, 1), (-1, -1), 10),
-                ('GRID', (0, 0), (-1, -1), 1, colors.grey),
-                ('VALIGN', (0, 0), (-1, -1), 'TOP'),
-            ]))
-            
-            self.story.append(payment_table)
-            self.story.append(Spacer(1, 0.5*cm))
+            left_content.append(f"<b>Payment Information:</b>")
+            left_content.append(f"Bank: {payment_info.get('bank', '')}")
+            left_content.append(f"Account: {payment_info.get('account', '')}")
+            if payment_info.get('swift'):
+                left_content.append(f"SWIFT: {payment_info.get('swift', '')}")
         
-        # 添加签名区域和图章
+        # 图章（右侧）
+        right_content = None
         if stamp_path and os.path.exists(stamp_path):
             try:
-                # 使用绝对路径确保能找到文件
                 abs_stamp_path = os.path.abspath(stamp_path)
-                if not os.path.exists(abs_stamp_path):
-                    raise FileNotFoundError(f"Stamp file not found: {abs_stamp_path}")
-                
-                # 如果有图章，在签名区域右侧显示图章
-                stamp_img = Image(abs_stamp_path, width=3*cm, height=3*cm)
-                signature_data = [
-                    ['Issuer Signature: _______________', stamp_img],
-                    ['Customer Signature: _______________', ''],
-                ]
-                signature_table = Table(signature_data, colWidths=[8*cm, 8*cm])
-                signature_table.setStyle(TableStyle([
-                    ('ALIGN', (0, 0), (0, -1), 'LEFT'),
-                    ('ALIGN', (1, 0), (1, 0), 'RIGHT'),
-                    ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
-                    ('FONTNAME', (0, 0), (0, -1), 'Helvetica'),
-                    ('FONTSIZE', (0, 0), (0, -1), 10),
-                ]))
+                if os.path.exists(abs_stamp_path):
+                    stamp_img = Image(abs_stamp_path, width=2.5*cm, height=2.5*cm)
+                    right_content = stamp_img
             except Exception as e:
                 print(f"Warning: Could not load stamp image: {e}")
-                print(f"Stamp path: {stamp_path}")
-                # 如果图章加载失败，使用默认签名区域
-                signature_data = [
-                    ['', ''],
-                    ['Issuer Signature: _______________', 'Customer Signature: _______________'],
-                ]
-                signature_table = Table(signature_data, colWidths=[8*cm, 8*cm])
-                signature_table.setStyle(TableStyle([
-                    ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
-                    ('FONTNAME', (0, 1), (-1, -1), 'Helvetica'),
-                    ('FONTSIZE', (0, 1), (-1, -1), 10),
-                    ('VALIGN', (0, 0), (-1, -1), 'TOP'),
-                ]))
-        else:
-            # 没有图章时使用默认签名区域
-            signature_data = [
-                ['', ''],
-                ['Issuer Signature: _______________', 'Customer Signature: _______________'],
-            ]
-            signature_table = Table(signature_data, colWidths=[8*cm, 8*cm])
-            signature_table.setStyle(TableStyle([
-                ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
-                ('FONTNAME', (0, 1), (-1, -1), 'Helvetica'),
-                ('FONTSIZE', (0, 1), (-1, -1), 10),
-                ('VALIGN', (0, 0), (-1, -1), 'TOP'),
-            ]))
         
-        self.story.append(Spacer(1, 1*cm))
-        self.story.append(signature_table)
+        # 创建底部布局
+        if left_content or right_content:
+            if left_content:
+                left_text = '<br/>'.join(left_content)
+                left_para = Paragraph(left_text, ParagraphStyle(
+                    'Footer',
+                    parent=self.styles['Normal'],
+                    fontSize=9,
+                    textColor=colors.HexColor('#666666'),
+                    leading=11
+                ))
+            else:
+                left_para = Paragraph('', ParagraphStyle('Footer', parent=self.styles['Normal']))
+            
+            if right_content:
+                # 有图章时，左右布局
+                footer_data = [[left_para, right_content]]
+                footer_table = Table(footer_data, colWidths=[12*cm, 4*cm])
+                footer_table.setStyle(TableStyle([
+                    ('VALIGN', (0, 0), (-1, -1), 'TOP'),
+                    ('ALIGN', (0, 0), (0, 0), 'LEFT'),
+                    ('ALIGN', (1, 0), (1, 0), 'RIGHT'),
+                ]))
+            else:
+                # 没有图章时，只有左侧内容
+                footer_data = [[left_para]]
+                footer_table = Table(footer_data, colWidths=[16*cm])
+                footer_table.setStyle(TableStyle([
+                    ('VALIGN', (0, 0), (-1, -1), 'TOP'),
+                    ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+                ]))
+            
+            self.story.append(Spacer(1, 0.3*cm))
+            self.story.append(footer_table)
     
     def generate(self):
         """生成PDF发票"""
