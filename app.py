@@ -43,19 +43,59 @@ def generate_invoice():
         logo_path = None
         if 'company_logo' in request.files:
             logo_file = request.files['company_logo']
-            if logo_file and logo_file.filename and allowed_file(logo_file.filename):
-                logo_filename = f"logo_{uuid.uuid4().hex[:8]}_{logo_file.filename}"
-                logo_path = os.path.join(app.config['UPLOAD_IMAGES'], logo_filename)
-                logo_file.save(logo_path)
+            if logo_file and logo_file.filename:
+                # 检查文件扩展名
+                if not allowed_file(logo_file.filename):
+                    return jsonify({
+                        'success': False,
+                        'error': f'Invalid logo file format. Allowed formats: {", ".join(ALLOWED_EXTENSIONS)}'
+                    }), 400
+                
+                try:
+                    logo_filename = f"logo_{uuid.uuid4().hex[:8]}_{logo_file.filename}"
+                    logo_path = os.path.join(app.config['UPLOAD_IMAGES'], logo_filename)
+                    logo_file.save(logo_path)
+                    # 验证文件是否成功保存
+                    if not os.path.exists(logo_path):
+                        logo_path = None
+                        return jsonify({
+                            'success': False,
+                            'error': 'Failed to save logo file'
+                        }), 400
+                except Exception as e:
+                    return jsonify({
+                        'success': False,
+                        'error': f'Error saving logo: {str(e)}'
+                    }), 400
         
         # 处理文件上传 - 图章
         stamp_path = None
         if 'company_stamp' in request.files:
             stamp_file = request.files['company_stamp']
-            if stamp_file and stamp_file.filename and allowed_file(stamp_file.filename):
-                stamp_filename = f"stamp_{uuid.uuid4().hex[:8]}_{stamp_file.filename}"
-                stamp_path = os.path.join(app.config['UPLOAD_IMAGES'], stamp_filename)
-                stamp_file.save(stamp_path)
+            if stamp_file and stamp_file.filename:
+                # 检查文件扩展名
+                if not allowed_file(stamp_file.filename):
+                    return jsonify({
+                        'success': False,
+                        'error': f'Invalid stamp file format. Allowed formats: {", ".join(ALLOWED_EXTENSIONS)}'
+                    }), 400
+                
+                try:
+                    stamp_filename = f"stamp_{uuid.uuid4().hex[:8]}_{stamp_file.filename}"
+                    stamp_path = os.path.join(app.config['UPLOAD_IMAGES'], stamp_filename)
+                    stamp_file.save(stamp_path)
+                    # 验证文件是否成功保存
+                    if not os.path.exists(stamp_path):
+                        stamp_path = None
+                        return jsonify({
+                            'success': False,
+                            'error': 'Failed to save stamp file'
+                        }), 400
+                except Exception as e:
+                    return jsonify({
+                        'success': False,
+                        'error': f'Error saving stamp: {str(e)}'
+                    }), 400
         
         # 公司信息
         company_info = {
@@ -117,31 +157,45 @@ def generate_invoice():
         output_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
         
         # 生成发票
-        create_invoice(
-            output_path=output_path,
-            company_info=company_info,
-            customer_info=customer_info,
-            invoice_info=invoice_info,
-            items=items,
-            tax_rate=tax_rate,
-            discount=discount,
-            notes=notes if notes else None,
-            payment_info=payment_info,
-            logo_path=logo_path,
-            stamp_path=stamp_path
-        )
+        try:
+            create_invoice(
+                output_path=output_path,
+                company_info=company_info,
+                customer_info=customer_info,
+                invoice_info=invoice_info,
+                items=items,
+                tax_rate=tax_rate,
+                discount=discount,
+                notes=notes if notes else None,
+                payment_info=payment_info,
+                logo_path=logo_path,
+                stamp_path=stamp_path
+            )
+        except Exception as e:
+            # 如果生成失败，清理上传的文件
+            if logo_path and os.path.exists(logo_path):
+                try:
+                    os.remove(logo_path)
+                except:
+                    pass
+            if stamp_path and os.path.exists(stamp_path):
+                try:
+                    os.remove(stamp_path)
+                except:
+                    pass
+            raise e
         
-        # 清理上传的临时图片文件
+        # 清理上传的临时图片文件（在PDF生成成功后）
         if logo_path and os.path.exists(logo_path):
             try:
                 os.remove(logo_path)
-            except:
-                pass
+            except Exception as e:
+                print(f"Warning: Could not remove logo file {logo_path}: {e}")
         if stamp_path and os.path.exists(stamp_path):
             try:
                 os.remove(stamp_path)
-            except:
-                pass
+            except Exception as e:
+                print(f"Warning: Could not remove stamp file {stamp_path}: {e}")
         
         # 返回下载链接
         return jsonify({

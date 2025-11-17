@@ -320,14 +320,32 @@
                 submitBtn.disabled = true;
                 submitBtn.textContent = '生成中...';
 
+                // 检查是否有文件上传
+                const logoFile = document.getElementById('company_logo').files[0];
+                const stampFile = document.getElementById('company_stamp').files[0];
+                
+                if (logoFile) {
+                    console.log('Logo file selected:', logoFile.name, 'Size:', logoFile.size, 'Type:', logoFile.type);
+                }
+                if (stampFile) {
+                    console.log('Stamp file selected:', stampFile.name, 'Size:', stampFile.size, 'Type:', stampFile.type);
+                }
+
                 fetch('/generate', {
                     method: 'POST',
                     body: formData
                 })
-                .then(response => response.json())
+                .then(response => {
+                    if (!response.ok) {
+                        return response.json().then(data => {
+                            throw new Error(data.error || `HTTP error! status: ${response.status}`);
+                        });
+                    }
+                    return response.json();
+                })
                 .then(data => {
                     if (data.success) {
-                        showMessage('发票生成成功！正在下载...', 'success');
+                        showMessage('Invoice generated successfully! Downloading...', 'success');
                         // 自动下载
                         setTimeout(() => {
                             window.location.href = data.download_url;
@@ -335,13 +353,14 @@
                             submitBtn.textContent = originalText;
                         }, 500);
                     } else {
-                        showMessage('生成失败: ' + data.error, 'error');
+                        showMessage('Generation failed: ' + (data.error || 'Unknown error'), 'error');
                         submitBtn.disabled = false;
                         submitBtn.textContent = originalText;
                     }
                 })
                 .catch(error => {
-                    showMessage('发生错误: ' + error.message, 'error');
+                    console.error('Error:', error);
+                    showMessage('Error: ' + error.message, 'error');
                     submitBtn.disabled = false;
                     submitBtn.textContent = originalText;
                 });

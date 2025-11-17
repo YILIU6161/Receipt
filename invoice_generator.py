@@ -59,7 +59,12 @@ class InvoiceGenerator:
         # 如果有Logo，创建带Logo的头部
         if logo_path and os.path.exists(logo_path):
             try:
-                logo_img = Image(logo_path, width=4*cm, height=4*cm)
+                # 使用绝对路径确保能找到文件
+                abs_logo_path = os.path.abspath(logo_path)
+                if not os.path.exists(abs_logo_path):
+                    raise FileNotFoundError(f"Logo file not found: {abs_logo_path}")
+                
+                logo_img = Image(abs_logo_path, width=4*cm, height=4*cm)
                 logo_img.hAlign = 'LEFT'
                 
                 # 创建Logo和标题的布局
@@ -80,7 +85,8 @@ class InvoiceGenerator:
                 ]))
                 self.story.append(header_table)
             except Exception as e:
-                print(f"警告: 无法加载Logo图片: {e}")
+                print(f"Warning: Could not load logo image: {e}")
+                print(f"Logo path: {logo_path}")
                 # 如果Logo加载失败，使用默认标题
                 title_style = ParagraphStyle(
                     'CustomTitle',
@@ -349,8 +355,13 @@ class InvoiceGenerator:
         # 添加签名区域和图章
         if stamp_path and os.path.exists(stamp_path):
             try:
+                # 使用绝对路径确保能找到文件
+                abs_stamp_path = os.path.abspath(stamp_path)
+                if not os.path.exists(abs_stamp_path):
+                    raise FileNotFoundError(f"Stamp file not found: {abs_stamp_path}")
+                
                 # 如果有图章，在签名区域右侧显示图章
-                stamp_img = Image(stamp_path, width=3*cm, height=3*cm)
+                stamp_img = Image(abs_stamp_path, width=3*cm, height=3*cm)
                 signature_data = [
                     ['Issuer Signature: _______________', stamp_img],
                     ['Customer Signature: _______________', ''],
@@ -364,7 +375,8 @@ class InvoiceGenerator:
                     ('FONTSIZE', (0, 0), (0, -1), 10),
                 ]))
             except Exception as e:
-                print(f"警告: 无法加载图章图片: {e}")
+                print(f"Warning: Could not load stamp image: {e}")
+                print(f"Stamp path: {stamp_path}")
                 # 如果图章加载失败，使用默认签名区域
                 signature_data = [
                     ['', ''],
