@@ -10,7 +10,7 @@
 - ✅ 支持多个发票项目（商品/服务），可动态添加/删除
 - ✅ 实时计算小计、税费、折扣和总计
 - ✅ 支持备注和支付信息
-- ✅ 支持JSON配置文件批量生成
+- ✅ 支持公司Logo和图章上传
 - ✅ 美观的表格布局和样式
 - ✅ 响应式设计，支持移动设备
 
@@ -56,38 +56,9 @@ http://127.0.0.1:5000
 - ➕ 动态添加/删除发票项目
 - 🎨 现代化的UI设计
 - 💾 自动下载生成的PDF
+- 🖼️ 支持上传公司Logo和图章
 
-### 方法2: 快速生成示例发票
-
-直接运行主程序，会生成一个示例发票：
-
-```bash
-python main.py
-```
-
-或使用sample命令：
-
-```bash
-python main.py sample
-```
-
-### 方法3: 使用配置文件
-
-1. 创建配置文件（可选，如果不存在会自动创建示例配置）：
-
-```bash
-python main.py config
-```
-
-2. 编辑 `config.json` 文件，填入你的发票信息
-
-3. 从配置文件生成发票：
-
-```bash
-python main.py generate
-```
-
-### 方法4: 在代码中使用
+### 在代码中使用
 
 ```python
 from invoice_generator import create_invoice
@@ -152,57 +123,17 @@ create_invoice(
 )
 ```
 
-## 配置文件格式
-
-`config.json` 文件格式如下：
-
-```json
-{
-  "company_info": {
-    "name": "公司名称",
-    "address": "公司地址",
-    "phone": "联系电话",
-    "email": "邮箱地址"
-  },
-  "customer_info": {
-    "name": "客户名称",
-    "address": "客户地址",
-    "phone": "客户电话",
-    "email": "客户邮箱"
-  },
-  "invoice_info": {
-    "number": "发票号码",
-    "date": "开票日期 (YYYY-MM-DD)",
-    "due_date": "到期日期 (YYYY-MM-DD)"
-  },
-  "items": [
-    {
-      "description": "项目描述",
-      "quantity": 数量,
-      "unit_price": 单价,
-      "amount": 金额（可选，会自动计算）
-    }
-  ],
-  "tax_rate": 税率百分比（如 13.0 表示 13%），
-  "discount": 折扣金额,
-  "notes": "备注信息（可选）",
-  "payment_info": {
-    "bank": "银行名称（可选）",
-    "account": "账户号码（可选）",
-    "swift": "SWIFT代码（可选）"
-  }
-}
-```
-
 ## 项目结构
 
 ```
 Project1/
-├── app.py                # Flask Web应用（推荐使用）
+├── app.py                # Flask Web应用主程序
 ├── invoice_generator.py  # 发票生成器核心类
-├── main.py               # 命令行主程序入口
-├── config.json           # 配置文件示例
 ├── requirements.txt      # Python依赖包
+├── gunicorn_config.py    # Gunicorn生产环境配置
+├── start_server.sh       # Linux/macOS启动脚本
+├── start_server.bat      # Windows启动脚本
+├── DEPLOYMENT.md         # 服务器部署指南
 ├── templates/            # HTML模板目录
 │   └── index.html       # 发票表单页面
 ├── static/               # 静态文件目录
@@ -237,11 +168,28 @@ generator.generate()
 3. 税率和折扣都是可选的，默认为0
 4. 备注和支付信息都是可选的
 
+## 服务器部署
+
+详细部署说明请参考 [DEPLOYMENT.md](DEPLOYMENT.md)
+
+快速启动：
+```bash
+# Linux/macOS
+./start_server.sh
+
+# Windows
+start_server.bat
+
+# 或直接使用Python
+python app.py
+```
+
 ## 依赖包
 
 - `reportlab`: PDF生成库
 - `Pillow`: 图像处理库（reportlab的依赖）
 - `Flask`: Web框架（用于Web界面）
+- `gunicorn`: 生产环境WSGI服务器（可选）
 
 ## 许可证
 
