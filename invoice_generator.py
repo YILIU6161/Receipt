@@ -10,6 +10,7 @@ from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 from datetime import datetime
 from typing import List, Dict, Optional
+from xml.sax.saxutils import escape
 import os
 
 
@@ -113,19 +114,28 @@ class InvoiceGenerator:
         
         self.story.append(Spacer(1, 0.3*cm))
         
+        # 创建文本样式
+        info_style = ParagraphStyle(
+            'InfoText',
+            parent=self.styles['Normal'],
+            fontSize=9,
+            leading=11,
+            textColor=colors.black
+        )
+        
         # 创建两列布局：Issuer信息和发票信息
         issuer_data = [
-            ['<b>Issuer</b>'],
-            [f"{company_info.get('name', '')}"],
-            [f"{company_info.get('address', '')}"],
-            [f"{company_info.get('phone', '')}"],
+            [Paragraph('<b>Issuer</b>', info_style)],
+            [Paragraph(escape(company_info.get('name', '') or ''), info_style)],
+            [Paragraph(escape(company_info.get('address', '') or ''), info_style)],
+            [Paragraph(escape(company_info.get('phone', '') or ''), info_style)],
         ]
         
         invoice_data = [
-            ['<b>Invoice Information</b>'],
-            [f"Invoice No.: {invoice_info.get('number', '')}"],
-            [f"Date: {invoice_info.get('date', '')}"],
-            [f"Purchase Order No.: {invoice_info.get('po_number', '')}"],
+            [Paragraph('<b>Invoice Information</b>', info_style)],
+            [Paragraph(f"Invoice No.: {escape(invoice_info.get('number', '') or '')}", info_style)],
+            [Paragraph(f"Date: {escape(invoice_info.get('date', '') or '')}", info_style)],
+            [Paragraph(f"Purchase Order No.: {escape(invoice_info.get('po_number', '') or '')}", info_style)],
         ]
         
         # 创建表格
@@ -180,11 +190,18 @@ class InvoiceGenerator:
         Args:
             shipper_info: 发货方信息字典 {'name': '', 'address': '', 'phone': ''}
         """
+        info_style = ParagraphStyle(
+            'InfoText',
+            parent=self.styles['Normal'],
+            fontSize=9,
+            leading=11,
+            textColor=colors.black
+        )
         shipper_data = [
-            ['<b>Shipper</b>'],
-            [f"{shipper_info.get('name', '')}"],
-            [f"{shipper_info.get('address', '')}"],
-            [f"{shipper_info.get('phone', '')}"],
+            [Paragraph('<b>Shipper</b>', info_style)],
+            [Paragraph(escape(shipper_info.get('name', '') or ''), info_style)],
+            [Paragraph(escape(shipper_info.get('address', '') or ''), info_style)],
+            [Paragraph(escape(shipper_info.get('phone', '') or ''), info_style)],
         ]
         
         shipper_table = Table(shipper_data, colWidths=[16*cm])
@@ -212,38 +229,45 @@ class InvoiceGenerator:
         Args:
             customer_info: 客户信息字典，包含所有字段
         """
+        info_style = ParagraphStyle(
+            'InfoText',
+            parent=self.styles['Normal'],
+            fontSize=9,
+            leading=11,
+            textColor=colors.black
+        )
         customer_data = [
-            ['<b>Consignee/Buyer</b>'],
-            [f"Company Name: {customer_info.get('name', '')}"],
+            [Paragraph('<b>Consignee/Buyer</b>', info_style)],
+            [Paragraph(f"Company Name: {escape(customer_info.get('name', '') or '')}", info_style)],
         ]
         
         # 添加Plant Address
         plant_address = customer_info.get('plant_address', '')
         if plant_address:
-            customer_data.append([f"Plant Address: {plant_address}"])
+            customer_data.append([Paragraph(f"Plant Address: {escape(plant_address)}", info_style)])
         
         # 添加Pin
         pin = customer_info.get('pin', '')
         if pin:
-            customer_data.append([f"Pin: {pin}"])
+            customer_data.append([Paragraph(f"Pin: {escape(pin)}", info_style)])
         
         # 添加其他基本信息
         address = customer_info.get('address', '')
         if address and not plant_address:
-            customer_data.append([f"Address: {address}"])
+            customer_data.append([Paragraph(f"Address: {escape(address)}", info_style)])
         
         phone = customer_info.get('phone', '')
         if phone:
-            customer_data.append([f"Phone: {phone}"])
+            customer_data.append([Paragraph(f"Phone: {escape(phone)}", info_style)])
         
         email = customer_info.get('email', '')
         if email:
-            customer_data.append([f"Email: {email}"])
+            customer_data.append([Paragraph(f"Email: {escape(email)}", info_style)])
         
         # 如果有其他内容，添加到列表中
         other = customer_info.get('other', '')
         if other:
-            customer_data.append([f"Other: {other}"])
+            customer_data.append([Paragraph(f"Other: {escape(other)}", info_style)])
         
         customer_table = Table(customer_data, colWidths=[16*cm])
         customer_table.setStyle(TableStyle([
@@ -270,29 +294,36 @@ class InvoiceGenerator:
         Args:
             shipping_info: 运输信息字典
         """
+        info_style = ParagraphStyle(
+            'InfoText',
+            parent=self.styles['Normal'],
+            fontSize=9,
+            leading=11,
+            textColor=colors.black
+        )
         shipping_data = [
-            ['<b>Shipping Details</b>'],
+            [Paragraph('<b>Shipping Details</b>', info_style)],
         ]
         
         port_of_shipment = shipping_info.get('port_of_shipment', '')
         if port_of_shipment:
-            shipping_data.append([f"Port of Shipment: {port_of_shipment}"])
+            shipping_data.append([Paragraph(f"Port of Shipment: {escape(port_of_shipment)}", info_style)])
         
         country_of_origin = shipping_info.get('country_of_origin', '')
         if country_of_origin:
-            shipping_data.append([f"Country of Origin: {country_of_origin}"])
+            shipping_data.append([Paragraph(f"Country of Origin: {escape(country_of_origin)}", info_style)])
         
         port_of_destination = shipping_info.get('port_of_destination', '')
         if port_of_destination:
-            shipping_data.append([f"Port of Destination: {port_of_destination}"])
+            shipping_data.append([Paragraph(f"Port of Destination: {escape(port_of_destination)}", info_style)])
         
         place_of_destination = shipping_info.get('place_of_destination', '')
         if place_of_destination:
-            shipping_data.append([f"Place of Final Destination: {place_of_destination}"])
+            shipping_data.append([Paragraph(f"Place of Final Destination: {escape(place_of_destination)}", info_style)])
         
         shipment_term = shipping_info.get('shipment_term', '')
         if shipment_term:
-            shipping_data.append([f"Shipment Term: {shipment_term}"])
+            shipping_data.append([Paragraph(f"Shipment Term: {escape(shipment_term)}", info_style)])
         
         if len(shipping_data) > 1:  # 如果有内容才显示
             shipping_table = Table(shipping_data, colWidths=[16*cm])
@@ -337,18 +368,36 @@ class InvoiceGenerator:
             self.story.append(desc_para)
             self.story.append(Spacer(1, 0.2*cm))
         
+        # 创建文本样式用于表格单元格
+        cell_style = ParagraphStyle(
+            'TableCell',
+            parent=self.styles['Normal'],
+            fontSize=8,
+            leading=10,
+            textColor=colors.black
+        )
+        
         # 表头 - 添加Product Name列
-        table_data = [['No.', 'Product Name', 'Product Number', 'Item Number', 'HS Code', 'Quantity', 'Unit Price (CNY)', 'Amount (CNY)']]
+        table_data = [[
+            Paragraph('No.', cell_style),
+            Paragraph('Product Name', cell_style),
+            Paragraph('Product Number', cell_style),
+            Paragraph('Item Number', cell_style),
+            Paragraph('HS Code', cell_style),
+            Paragraph('Quantity', cell_style),
+            Paragraph('Unit Price (CNY)', cell_style),
+            Paragraph('Amount (CNY)', cell_style)
+        ]]
         
         # 添加项目数据
         total_amount = 0
         total_quantity = 0
         for idx, item in enumerate(items, 1):
-            product_name = item.get('product_name', '')
-            product_number = item.get('product_number', '')
-            item_number = item.get('item_number', '')
-            hs_code = item.get('hs_code', '')
-            description = item.get('description', '')
+            product_name = item.get('product_name', '') or ''
+            product_number = item.get('product_number', '') or ''
+            item_number = item.get('item_number', '') or ''
+            hs_code = item.get('hs_code', '') or ''
+            description = item.get('description', '') or ''
             # 如果没有product_name，使用description
             if not product_name:
                 product_name = description
@@ -358,23 +407,24 @@ class InvoiceGenerator:
             total_amount += amount
             total_quantity += quantity
             
+            # 转义HTML特殊字符并创建Paragraph对象以支持自动换行
             table_data.append([
-                str(idx),
-                product_name,
-                product_number,
-                item_number,
-                hs_code,
-                f"{quantity:.0f}",
-                f"CNY {unit_price:.2f}",
-                f"CNY {amount:,.2f}"
+                Paragraph(str(idx), cell_style),
+                Paragraph(escape(product_name), cell_style),
+                Paragraph(escape(product_number), cell_style),
+                Paragraph(escape(item_number), cell_style),
+                Paragraph(escape(hs_code), cell_style),
+                Paragraph(f"{quantity:.0f}", cell_style),
+                Paragraph(f"CNY {unit_price:.2f}", cell_style),
+                Paragraph(f"CNY {amount:,.2f}", cell_style)
             ])
         
         # 创建表格 - 调整列宽以适应新列（包含Product Name）
         # A4宽度21cm，减去左右边距3cm，可用宽度18cm
-        # 列宽分配：No.(0.6) + Product Name(2.5) + Product No.(1.2) + Item No.(1.2) + HS Code(1.2) + Quantity(0.9) + Unit Price(1.3) + Amount(1.3) = 11.2cm
+        # 列宽分配：No.(0.7) + Product Name(3.5) + Product No.(1.5) + Item No.(1.5) + HS Code(1.5) + Quantity(1.0) + Unit Price(1.5) + Amount(1.8) = 14cm
         items_table = Table(
             table_data,
-            colWidths=[0.6*cm, 2.5*cm, 1.2*cm, 1.2*cm, 1.2*cm, 0.9*cm, 1.3*cm, 1.3*cm]
+            colWidths=[0.7*cm, 3.5*cm, 1.5*cm, 1.5*cm, 1.5*cm, 1.0*cm, 1.5*cm, 1.8*cm]
         )
         
         # 设置表格样式
@@ -382,9 +432,9 @@ class InvoiceGenerator:
             # 表头样式
             ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#4a90e2')),
             ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
-            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+            ('ALIGN', (0, 0), (-1, 0), 'CENTER'),
             ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
-            ('FONTSIZE', (0, 0), (-1, 0), 10),
+            ('FONTSIZE', (0, 0), (-1, 0), 9),
             ('BOTTOMPADDING', (0, 0), (-1, 0), 6),
             ('TOPPADDING', (0, 0), (-1, 0), 6),
             
@@ -394,10 +444,15 @@ class InvoiceGenerator:
             ('FONTNAME', (0, 1), (-1, -1), 'Helvetica'),
             ('FONTSIZE', (0, 1), (-1, -1), 8),
             ('GRID', (0, 0), (-1, -1), 1, colors.grey),
-            ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+            ('VALIGN', (0, 0), (-1, -1), 'TOP'),  # 改为TOP以便多行文本正确显示
+            ('ALIGN', (0, 1), (0, -1), 'CENTER'),  # No. 居中
             ('ALIGN', (1, 1), (4, -1), 'LEFT'),  # Product Name, Product Number, Item Number, HS Code 左对齐
             ('ALIGN', (5, 1), (5, -1), 'CENTER'),  # Quantity 居中
             ('ALIGN', (6, 1), (7, -1), 'RIGHT'),  # Unit Price, Amount 右对齐
+            ('LEFTPADDING', (0, 0), (-1, -1), 4),
+            ('RIGHTPADDING', (0, 0), (-1, -1), 4),
+            ('TOPPADDING', (0, 1), (-1, -1), 4),
+            ('BOTTOMPADDING', (0, 1), (-1, -1), 4),
         ]))
         
         self.story.append(items_table)
@@ -434,7 +489,7 @@ class InvoiceGenerator:
         
         total_table = Table(
             total_data,
-            colWidths=[0.6*cm, 2.5*cm, 1.2*cm, 1.2*cm, 1.2*cm, 0.9*cm, 1.3*cm, 1.3*cm]
+            colWidths=[0.7*cm, 3.5*cm, 1.5*cm, 1.5*cm, 1.5*cm, 1.0*cm, 1.5*cm, 1.8*cm]
         )
         
         total_table.setStyle(TableStyle([
