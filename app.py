@@ -8,10 +8,15 @@ from datetime import datetime, timedelta
 import os
 import uuid
 
-app = Flask(__name__)
+app = Flask(__name__, 
+            static_folder='static',
+            static_url_path='/static',
+            template_folder='templates')
 app.config['SECRET_KEY'] = 'your-secret-key-here'
-app.config['UPLOAD_FOLDER'] = 'generated_invoices'
-app.config['UPLOAD_IMAGES'] = 'uploaded_images'
+# 使用绝对路径确保在服务器上正常工作
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+app.config['UPLOAD_FOLDER'] = os.path.join(BASE_DIR, 'generated_invoices')
+app.config['UPLOAD_IMAGES'] = os.path.join(BASE_DIR, 'uploaded_images')
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max file size
 
 # 确保输出目录存在
@@ -30,6 +35,12 @@ def allowed_file(filename):
 def index():
     """首页 - 显示发票表单"""
     return render_template('index.html')
+
+
+@app.route('/health')
+def health_check():
+    """健康检查端点"""
+    return jsonify({'status': 'ok', 'message': '服务运行正常'}), 200
 
 
 @app.route('/generate', methods=['POST'])
@@ -251,8 +262,12 @@ def generate_invoice():
 @app.route('/download/<filename>')
 def download_invoice(filename):
     """下载生成的发票PDF"""
+    # 安全检查：防止路径遍历攻击
+    if '..' in filename or '/' in filename or '\\' in filename:
+        return "无效的文件名", 400
+    
     file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-    if os.path.exists(file_path):
+    if os.path.exists(file_path) and os.path.isfile(file_path):
         return send_file(file_path, as_attachment=True, download_name=filename)
     else:
         return "文件不存在", 404
@@ -306,11 +321,21 @@ def preview_invoice():
 
 
 if __name__ == '__main__':
+    import sys
+    # 检查是否为生产环境
+    debug_mode = os.environ.get('FLASK_DEBUG', 'False').lower() == 'true'
+    port = int(os.environ.get('PORT', 5000))
+    host = os.environ.get('HOST', '0.0.0.0')
+    
     print("=" * 50)
     print("发票生成器 Web应用")
     print("=" * 50)
-    print("访问地址: http://127.0.0.1:5000")
+    print(f"运行模式: {'开发模式' if debug_mode else '生产模式'}")
+    print(f"监听地址: {host}:{port}")
+    print(f"访问地址: http://localhost:{port}")
+    if host == '0.0.0.0':
+        print(f"外部访问: http://<服务器IP>:{port}")
     print("按 Ctrl+C 停止服务器")
     print("=" * 50)
-    app.run(debug=True, host='0.0.0.0', port=5000)
+    app.run(debug=debug_mode, host=host, port=port, threaded=True)
 
