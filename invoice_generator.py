@@ -591,9 +591,9 @@ class InvoiceGenerator:
         # 设置表格样式（包括总计行）
         total_row_idx = len(table_data) - 1
         items_table.setStyle(TableStyle([
-            # 表头样式
-            ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#1a1a1a')),  # 深色背景，更接近图片
-            ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
+            # 表头样式 - 白色背景，黑色文字
+            ('BACKGROUND', (0, 0), (-1, 0), colors.white),
+            ('TEXTCOLOR', (0, 0), (-1, 0), colors.black),
             ('ALIGN', (0, 0), (-1, 0), 'CENTER'),
             ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
             ('FONTSIZE', (0, 0), (-1, 0), 9),
