@@ -395,9 +395,18 @@ if __name__ == '__main__':
     print(f"健康检查: http://{host if host != '0.0.0.0' else 'localhost'}:{port}/health")
     print("按 Ctrl+C 停止服务器")
     print("=" * 50)
+    print("")
+    print("💡 提示: 日志会显示在此终端")
+    print("💡 如需后台运行: nohup python3 app.py > app.log 2>&1 &")
+    print("💡 查看日志: tail -f app.log")
+    print("")
     
     try:
+        print(f"🚀 正在启动服务器...")
         app.run(debug=debug_mode, host=host, port=port, threaded=True, use_reloader=False)
+    except KeyboardInterrupt:
+        print("\n\n服务器已停止")
+        sys.exit(0)
     except Exception as e:
         print(f"❌ 启动失败: {e}")
         import traceback

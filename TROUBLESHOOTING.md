@@ -57,10 +57,12 @@ curl http://127.0.0.1:5000/health
 wget http://127.0.0.1:5000/health
 ```
 
-### 方法3: 使用Python测试脚本
+### 方法3: 使用curl测试多个端点
 
 ```bash
-python3 test_server.py 127.0.0.1:5000
+# 测试多个端点
+curl http://127.0.0.1:5000/
+curl http://127.0.0.1:5000/health
 ```
 
 ## 3. 检查网络配置
