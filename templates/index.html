@@ -16,6 +16,25 @@
         </header>
 
         <form id="invoiceForm" class="invoice-form" enctype="multipart/form-data">
+            <!-- 发货方信息 -->
+            <section class="form-section">
+                <h2>发货方信息 / Shipper Information</h2>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="shipper_name">发货方名称 / Shipper Name <span class="required">*</span></label>
+                        <input type="text" id="shipper_name" name="shipper_name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="shipper_address">发货方地址 / Shipper Address <span class="required">*</span></label>
+                        <input type="text" id="shipper_address" name="shipper_address" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="shipper_phone">发货方联系方式 / Shipper Contact <span class="required">*</span></label>
+                        <input type="text" id="shipper_phone" name="shipper_phone" required>
+                    </div>
+                </div>
+            </section>
+
             <!-- 公司信息 -->
             <section class="form-section">
                 <h2>开票方信息 / Issuer Information</h2>
@@ -27,14 +46,6 @@
                     <div class="form-group">
                         <label for="company_address">公司地址 / Company Address <span class="required">*</span></label>
                         <input type="text" id="company_address" name="company_address" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="company_phone">联系电话 / Phone</label>
-                        <input type="text" id="company_phone" name="company_phone">
-                    </div>
-                    <div class="form-group">
-                        <label for="company_email">邮箱地址 / Email</label>
-                        <input type="email" id="company_email" name="company_email">
                     </div>
                     <div class="form-group full-width">
                         <label for="company_logo">公司Logo（可选）/ Company Logo (Optional)</label>
@@ -66,12 +77,12 @@
                         <input type="text" id="customer_address" name="customer_address">
                     </div>
                     <div class="form-group">
-                        <label for="customer_phone">电话 / Phone</label>
+                        <label for="customer_phone">联系方式 / Contact</label>
                         <input type="text" id="customer_phone" name="customer_phone">
                     </div>
                     <div class="form-group">
-                        <label for="customer_email">邮箱 / Email</label>
-                        <input type="email" id="customer_email" name="customer_email">
+                        <label for="customer_email">其他信息 / Other Information</label>
+                        <input type="text" id="customer_email" name="customer_email">
                     </div>
                 </div>
             </section>
@@ -125,25 +136,6 @@
                             <option value="CNY">CNY (人民币)</option>
                             <option value="USD">USD (美元)</option>
                         </select>
-                    </div>
-                </div>
-            </section>
-
-            <!-- 发货方信息 -->
-            <section class="form-section">
-                <h2>发货方信息（可选）/ Shipper Information (Optional)</h2>
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label for="shipper_name">发货方名称 / Shipper Name</label>
-                        <input type="text" id="shipper_name" name="shipper_name">
-                    </div>
-                    <div class="form-group">
-                        <label for="shipper_address">发货方地址 / Shipper Address</label>
-                        <input type="text" id="shipper_address" name="shipper_address">
-                    </div>
-                    <div class="form-group">
-                        <label for="shipper_phone">发货方电话 / Shipper Phone</label>
-                        <input type="text" id="shipper_phone" name="shipper_phone">
                     </div>
                 </div>
             </section>

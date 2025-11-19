@@ -106,11 +106,9 @@ class InvoiceGenerator:
         # 公司信息居中显示
         company_name = Paragraph(escape(company_info.get('name', '') or ''), company_style)
         company_address = Paragraph(escape(company_info.get('address', '') or ''), company_style)
-        company_phone = Paragraph(escape(company_info.get('phone', '') or ''), company_style)
         
         self.story.append(company_name)
         self.story.append(company_address)
-        self.story.append(company_phone)
         self.story.append(Spacer(1, 0.3*cm))
         
         # COMMERCIAL INVOICE 标题居中加粗
@@ -175,107 +173,96 @@ class InvoiceGenerator:
         self.story.append(invoice_info_table)
         self.story.append(Spacer(1, 0.4*cm))
     
-    def add_shipper_and_consignee(self, shipper_info: Optional[Dict[str, str]], customer_info: Dict[str, str]):
+    def add_shipper_and_consignee(self, shipper_info: Dict[str, str], customer_info: Dict[str, str]):
         """
-        添加发货方和收货方信息 - 并排显示
+        添加发货方和收货方信息 - 段落式布局，并排显示
         
         Args:
-            shipper_info: 发货方信息字典 {'name': '', 'address': '', 'phone': ''}（可选）
+            shipper_info: 发货方信息字典 {'name': '', 'address': '', 'phone': ''}（必填）
             customer_info: 客户信息字典
         """
+        # 创建段落样式，支持自动换行
+        title_style = ParagraphStyle(
+            'InfoTitle',
+            parent=self.styles['Normal'],
+            fontSize=10,
+            leading=12,
+            textColor=colors.black,
+            fontName='Helvetica-Bold',
+            spaceAfter=4
+        )
+        
         info_style = ParagraphStyle(
             'InfoText',
             parent=self.styles['Normal'],
             fontSize=9,
             leading=11,
-            textColor=colors.black
+            textColor=colors.black,
+            leftIndent=0,
+            rightIndent=0
         )
         
-        # 左列：Shipper信息
-        if shipper_info:
-            shipper_data = [
-                [Paragraph('<b>Shipper</b>', info_style)],
-                [Paragraph(escape(shipper_info.get('name', '') or ''), info_style)],
-                [Paragraph(escape(shipper_info.get('address', '') or ''), info_style)],
-                [Paragraph(escape(shipper_info.get('phone', '') or ''), info_style)],
-            ]
-        else:
-            # 如果没有shipper信息，使用公司信息
-            shipper_data = [
-                [Paragraph('<b>Shipper</b>', info_style)],
-                [Paragraph('', info_style)],
-            ]
+        # 构建发货方信息文本（左列）
+        shipper_text_parts = ['<b>Shipper</b><br/>']
+        shipper_name = shipper_info.get('name', '') or ''
+        if shipper_name:
+            shipper_text_parts.append(f"{escape(shipper_name)}<br/>")
+        shipper_address = shipper_info.get('address', '') or ''
+        if shipper_address:
+            shipper_text_parts.append(f"{escape(shipper_address)}<br/>")
+        shipper_phone = shipper_info.get('phone', '') or ''
+        if shipper_phone:
+            shipper_text_parts.append(f"{escape(shipper_phone)}")
         
-        # 右列：Consignee/Buyer信息
-        customer_data = [
-            [Paragraph('<b>Consignee/Buyer</b>', info_style)],
-            [Paragraph(f"Company Name: {escape(customer_info.get('name', '') or '')}", info_style)],
-        ]
+        # 构建收货方信息文本（右列）
+        customer_text_parts = ['<b>Consignee/Buyer</b><br/>']
+        customer_name = customer_info.get('name', '') or ''
+        if customer_name:
+            customer_text_parts.append(f"Company Name: {escape(customer_name)}<br/>")
         
-        # 添加Plant Address
         plant_address = customer_info.get('plant_address', '')
         if plant_address:
-            customer_data.append([Paragraph(f"Plant Address: {escape(plant_address)}", info_style)])
+            customer_text_parts.append(f"Plant Address: {escape(plant_address)}<br/>")
         
-        # 添加Pin
         pin = customer_info.get('pin', '')
         if pin:
-            customer_data.append([Paragraph(f"Pin: {escape(pin)}", info_style)])
+            customer_text_parts.append(f"Pin: {escape(pin)}<br/>")
         
-        # 添加其他基本信息
         address = customer_info.get('address', '')
         if address and not plant_address:
-            customer_data.append([Paragraph(f"Address: {escape(address)}", info_style)])
+            customer_text_parts.append(f"Address: {escape(address)}<br/>")
         
         phone = customer_info.get('phone', '')
         if phone:
-            customer_data.append([Paragraph(f"Phone: {escape(phone)}", info_style)])
+            customer_text_parts.append(f"Contact: {escape(phone)}<br/>")
         
         email = customer_info.get('email', '')
         if email:
-            customer_data.append([Paragraph(f"Email: {escape(email)}", info_style)])
+            customer_text_parts.append(f"Other Information: {escape(email)}<br/>")
         
-        # 如果有其他内容，添加到列表中
         other = customer_info.get('other', '')
         if other:
-            customer_data.append([Paragraph(f"Other: {escape(other)}", info_style)])
+            customer_text_parts.append(f"Other: {escape(other)}")
         
-        # 确保两列行数相同（用于对齐）
-        max_rows = max(len(shipper_data), len(customer_data))
-        while len(shipper_data) < max_rows:
-            shipper_data.append([Paragraph('', info_style)])
-        while len(customer_data) < max_rows:
-            customer_data.append([Paragraph('', info_style)])
+        # 创建段落对象，设置宽度以支持自动换行
+        shipper_para = Paragraph(''.join(shipper_text_parts), info_style)
+        customer_para = Paragraph(''.join(customer_text_parts), info_style)
         
-        shipper_table = Table(shipper_data, colWidths=[8*cm])
-        customer_table = Table(customer_data, colWidths=[8*cm])
-        
-        # 设置表格样式
-        for table in [shipper_table, customer_table]:
-            table.setStyle(TableStyle([
-                ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#e8e8e8')),
-                ('TEXTCOLOR', (0, 0), (-1, 0), colors.black),
-                ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
-                ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
-                ('FONTSIZE', (0, 0), (-1, 0), 11),
-                ('BOTTOMPADDING', (0, 0), (-1, 0), 8),
-                ('BACKGROUND', (0, 1), (-1, -1), colors.white),
-                ('FONTNAME', (0, 1), (-1, -1), 'Helvetica'),
-                ('FONTSIZE', (0, 1), (-1, -1), 9),
-                ('GRID', (0, 0), (-1, -1), 1, colors.grey),
-                ('VALIGN', (0, 0), (-1, -1), 'TOP'),
-            ]))
-        
-        # 创建并排的两个表格
-        combined_table = Table([
-            [shipper_table, customer_table]
+        # 使用表格进行并排布局（无边框，仅用于布局）
+        layout_table = Table([
+            [shipper_para, customer_para]
         ], colWidths=[8*cm, 8*cm])
         
-        combined_table.setStyle(TableStyle([
+        layout_table.setStyle(TableStyle([
             ('VALIGN', (0, 0), (-1, -1), 'TOP'),
+            ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+            ('LEFTPADDING', (0, 0), (-1, -1), 0),
+            ('RIGHTPADDING', (0, 0), (-1, -1), 0),
+            ('TOPPADDING', (0, 0), (-1, -1), 0),
+            ('BOTTOMPADDING', (0, 0), (-1, -1), 0),
         ]))
         
-        self.story.append(combined_table)
+        self.story.append(layout_table)
         self.story.append(Spacer(1, 0.3*cm))
     
     def add_shipper_info(self, shipper_info: Dict[str, str]):
@@ -352,11 +339,11 @@ class InvoiceGenerator:
         
         phone = customer_info.get('phone', '')
         if phone:
-            customer_data.append([Paragraph(f"Phone: {escape(phone)}", info_style)])
+            customer_data.append([Paragraph(f"Contact: {escape(phone)}", info_style)])
         
         email = customer_info.get('email', '')
         if email:
-            customer_data.append([Paragraph(f"Email: {escape(email)}", info_style)])
+            customer_data.append([Paragraph(f"Other Information: {escape(email)}", info_style)])
         
         # 如果有其他内容，添加到列表中
         other = customer_info.get('other', '')
@@ -384,7 +371,7 @@ class InvoiceGenerator:
     
     def add_shipping_details(self, shipping_info: Dict[str, str]):
         """
-        添加运输详情 - 左右两列布局
+        添加运输详情 - 段落式布局，并排显示
         
         Args:
             shipping_info: 运输信息字典
@@ -397,73 +384,52 @@ class InvoiceGenerator:
             textColor=colors.black
         )
         
-        # 左列数据
-        shipping_left_data = [
-            [Paragraph('<b>Shipping Details</b>', info_style)],
-        ]
+        # 构建左列文本
+        shipping_left_parts = ['<b>Shipping Details</b><br/>']
         
         port_of_shipment = shipping_info.get('port_of_shipment', '')
         if port_of_shipment:
-            shipping_left_data.append([Paragraph(f"Port of Shipment: {escape(port_of_shipment)}", info_style)])
+            shipping_left_parts.append(f"Port of Shipment: {escape(port_of_shipment)}<br/>")
         
         country_of_origin = shipping_info.get('country_of_origin', '')
         if country_of_origin:
-            shipping_left_data.append([Paragraph(f"Country of Origin: {escape(country_of_origin)}", info_style)])
+            shipping_left_parts.append(f"Country of Origin: {escape(country_of_origin)}")
         
-        # 右列数据
-        shipping_right_data = [
-            [Paragraph('', info_style)],  # 空标题行
-        ]
+        # 构建右列文本
+        shipping_right_parts = ['<br/>']  # 空行以保持对齐
         
         port_of_destination = shipping_info.get('port_of_destination', '')
         if port_of_destination:
-            shipping_right_data.append([Paragraph(f"Port of Destination: {escape(port_of_destination)}", info_style)])
+            shipping_right_parts.append(f"Port of Destination: {escape(port_of_destination)}<br/>")
         
         place_of_destination = shipping_info.get('place_of_destination', '')
         if place_of_destination:
-            shipping_right_data.append([Paragraph(f"Place of Final Destination: {escape(place_of_destination)}", info_style)])
+            shipping_right_parts.append(f"Place of Final Destination: {escape(place_of_destination)}<br/>")
         
         shipment_term = shipping_info.get('shipment_term', '')
         if shipment_term:
-            shipping_right_data.append([Paragraph(f"Shipment Term: {escape(shipment_term)}", info_style)])
+            shipping_right_parts.append(f"Shipment Term: {escape(shipment_term)}")
         
-        # 确保两列行数相同
-        max_rows = max(len(shipping_left_data), len(shipping_right_data))
-        while len(shipping_left_data) < max_rows:
-            shipping_left_data.append([Paragraph('', info_style)])
-        while len(shipping_right_data) < max_rows:
-            shipping_right_data.append([Paragraph('', info_style)])
-        
-        if len(shipping_left_data) > 1 or len(shipping_right_data) > 1:  # 如果有内容才显示
-            shipping_left_table = Table(shipping_left_data, colWidths=[8*cm])
-            shipping_right_table = Table(shipping_right_data, colWidths=[8*cm])
+        # 如果有内容才显示
+        if len(shipping_left_parts) > 1 or len(shipping_right_parts) > 1:
+            shipping_left_para = Paragraph(''.join(shipping_left_parts), info_style)
+            shipping_right_para = Paragraph(''.join(shipping_right_parts), info_style)
             
-            # 设置表格样式
-            for table in [shipping_left_table, shipping_right_table]:
-                table.setStyle(TableStyle([
-                    ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#e8e8e8')),
-                    ('TEXTCOLOR', (0, 0), (-1, 0), colors.black),
-                    ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
-                    ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
-                    ('FONTSIZE', (0, 0), (-1, 0), 11),
-                    ('BOTTOMPADDING', (0, 0), (-1, 0), 8),
-                    ('BACKGROUND', (0, 1), (-1, -1), colors.white),
-                    ('FONTNAME', (0, 1), (-1, -1), 'Helvetica'),
-                    ('FONTSIZE', (0, 1), (-1, -1), 9),
-                    ('GRID', (0, 0), (-1, -1), 1, colors.grey),
-                    ('VALIGN', (0, 0), (-1, -1), 'TOP'),
-                ]))
-            
-            # 创建并排的两个表格
-            combined_table = Table([
-                [shipping_left_table, shipping_right_table]
+            # 使用表格进行并排布局（无边框，仅用于布局）
+            layout_table = Table([
+                [shipping_left_para, shipping_right_para]
             ], colWidths=[8*cm, 8*cm])
             
-            combined_table.setStyle(TableStyle([
+            layout_table.setStyle(TableStyle([
                 ('VALIGN', (0, 0), (-1, -1), 'TOP'),
+                ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+                ('LEFTPADDING', (0, 0), (-1, -1), 0),
+                ('RIGHTPADDING', (0, 0), (-1, -1), 0),
+                ('TOPPADDING', (0, 0), (-1, -1), 0),
+                ('BOTTOMPADDING', (0, 0), (-1, -1), 0),
             ]))
             
-            self.story.append(combined_table)
+            self.story.append(layout_table)
             self.story.append(Spacer(1, 0.3*cm))
     
     def add_items(self, items: List[Dict[str, any]], product_description: Optional[str] = None):
@@ -815,7 +781,7 @@ def create_invoice(
     payment_info: Optional[Dict[str, str]] = None,
     logo_path: Optional[str] = None,
     stamp_path: Optional[str] = None,
-    shipper_info: Optional[Dict[str, str]] = None,
+    shipper_info: Dict[str, str],
     shipping_info: Optional[Dict[str, str]] = None,
     product_description: Optional[str] = None,
     currency: str = 'CNY'
@@ -835,7 +801,7 @@ def create_invoice(
         payment_info: 支付信息
         logo_path: 公司Logo图片路径（可选）
         stamp_path: 图章图片路径（可选）
-        shipper_info: 发货方信息（可选）
+        shipper_info: 发货方信息（必填）
         shipping_info: 运输详情（可选）
         product_description: 产品总体描述（可选）
     

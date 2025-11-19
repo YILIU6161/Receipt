@@ -145,19 +145,15 @@ def generate_invoice():
         # 公司信息
         company_info = {
             'name': data.get('company_name', ''),
-            'address': data.get('company_address', ''),
-            'phone': data.get('company_phone', ''),
-            'email': data.get('company_email', '')
+            'address': data.get('company_address', '')
         }
         
-        # 发货方信息（可选）
-        shipper_info = None
-        if data.get('shipper_name'):
-            shipper_info = {
-                'name': data.get('shipper_name', ''),
-                'address': data.get('shipper_address', ''),
-                'phone': data.get('shipper_phone', '')
-            }
+        # 发货方信息（必填）
+        shipper_info = {
+            'name': data.get('shipper_name', ''),
+            'address': data.get('shipper_address', ''),
+            'phone': data.get('shipper_phone', '')
+        }
         
         # 客户信息（Consignee/Buyer）
         customer_info = {
