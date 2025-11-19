@@ -322,20 +322,85 @@ def preview_invoice():
 
 if __name__ == '__main__':
     import sys
+    import socket
+    
     # 检查是否为生产环境
     debug_mode = os.environ.get('FLASK_DEBUG', 'False').lower() == 'true'
     port = int(os.environ.get('PORT', 5000))
     host = os.environ.get('HOST', '0.0.0.0')
     
+    # 检查端口是否可用
+    def is_port_available(port, host='0.0.0.0'):
+        """检查端口是否可用"""
+        try:
+            with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+                s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+                result = s.bind((host, port))
+                return True
+        except OSError:
+            return False
+    
+    # 获取服务器IP地址
+    def get_server_ip():
+        """获取服务器IP地址"""
+        try:
+            # 创建一个UDP socket来获取本机IP
+            s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+            s.connect(("8.8.8.8", 80))
+            ip = s.getsockname()[0]
+            s.close()
+            return ip
+        except Exception:
+            return "无法获取"
+    
     print("=" * 50)
     print("发票生成器 Web应用")
     print("=" * 50)
+    
+    # 检查端口
+    if not is_port_available(port, host):
+        print(f"❌ 错误: 端口 {port} 已被占用或无法绑定")
+        print(f"请检查是否有其他进程在使用该端口")
+        sys.exit(1)
+    
+    # 检查目录
+    print(f"工作目录: {BASE_DIR}")
+    print(f"模板目录: {os.path.join(BASE_DIR, 'templates')}")
+    print(f"静态目录: {os.path.join(BASE_DIR, 'static')}")
+    
+    # 检查模板文件
+    template_path = os.path.join(BASE_DIR, 'templates', 'index.html')
+    if not os.path.exists(template_path):
+        print(f"❌ 警告: 模板文件不存在: {template_path}")
+    else:
+        print(f"✅ 模板文件: {template_path}")
+    
+    # 检查静态文件
+    static_path = os.path.join(BASE_DIR, 'static', 'css', 'style.css')
+    if not os.path.exists(static_path):
+        print(f"❌ 警告: 静态文件不存在: {static_path}")
+    else:
+        print(f"✅ 静态文件: {static_path}")
+    
     print(f"运行模式: {'开发模式' if debug_mode else '生产模式'}")
     print(f"监听地址: {host}:{port}")
-    print(f"访问地址: http://localhost:{port}")
+    print(f"本地访问: http://127.0.0.1:{port}")
+    print(f"本地访问: http://localhost:{port}")
+    
     if host == '0.0.0.0':
+        server_ip = get_server_ip()
+        print(f"外部访问: http://{server_ip}:{port}")
         print(f"外部访问: http://<服务器IP>:{port}")
+    
+    print(f"健康检查: http://{host if host != '0.0.0.0' else 'localhost'}:{port}/health")
     print("按 Ctrl+C 停止服务器")
     print("=" * 50)
-    app.run(debug=debug_mode, host=host, port=port, threaded=True)
+    
+    try:
+        app.run(debug=debug_mode, host=host, port=port, threaded=True, use_reloader=False)
+    except Exception as e:
+        print(f"❌ 启动失败: {e}")
+        import traceback
+        traceback.print_exc()
+        sys.exit(1)
 
