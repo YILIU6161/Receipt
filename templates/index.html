@@ -18,26 +18,26 @@
         <form id="invoiceForm" class="invoice-form" enctype="multipart/form-data">
             <!-- 公司信息 -->
             <section class="form-section">
-                <h2>开票方信息</h2>
+                <h2>开票方信息 / Issuer Information</h2>
                 <div class="form-grid">
                     <div class="form-group">
-                        <label for="company_name">公司名称 <span class="required">*</span></label>
+                        <label for="company_name">公司名称 / Company Name <span class="required">*</span></label>
                         <input type="text" id="company_name" name="company_name" required>
                     </div>
                     <div class="form-group">
-                        <label for="company_address">公司地址 <span class="required">*</span></label>
+                        <label for="company_address">公司地址 / Company Address <span class="required">*</span></label>
                         <input type="text" id="company_address" name="company_address" required>
                     </div>
                     <div class="form-group">
-                        <label for="company_phone">联系电话</label>
+                        <label for="company_phone">联系电话 / Phone</label>
                         <input type="text" id="company_phone" name="company_phone">
                     </div>
                     <div class="form-group">
-                        <label for="company_email">邮箱地址</label>
+                        <label for="company_email">邮箱地址 / Email</label>
                         <input type="email" id="company_email" name="company_email">
                     </div>
                     <div class="form-group full-width">
-                        <label for="company_logo">公司Logo（可选）</label>
+                        <label for="company_logo">公司Logo（可选）/ Company Logo (Optional)</label>
                         <input type="file" id="company_logo" name="company_logo" accept="image/*">
                         <small class="file-hint">支持 PNG, JPG, JPEG, GIF, BMP, WEBP 格式，建议尺寸 200x200px 或更大</small>
                         <div id="logo-preview" class="image-preview"></div>
@@ -47,30 +47,30 @@
 
             <!-- 收货方/买方信息 -->
             <section class="form-section">
-                <h2>Consignee/Buyer Information</h2>
+                <h2>收货方/买方信息 / Consignee/Buyer Information</h2>
                 <div class="form-grid">
                     <div class="form-group">
-                        <label for="customer_name">Company Name <span class="required">*</span></label>
+                        <label for="customer_name">公司名称 / Company Name <span class="required">*</span></label>
                         <input type="text" id="customer_name" name="customer_name" required>
                     </div>
                     <div class="form-group">
-                        <label for="plant_address">Plant Address</label>
+                        <label for="plant_address">工厂地址 / Plant Address</label>
                         <input type="text" id="plant_address" name="plant_address">
                     </div>
                     <div class="form-group">
-                        <label for="pin">Pin</label>
+                        <label for="pin">邮编 / Pin</label>
                         <input type="text" id="pin" name="pin">
                     </div>
                     <div class="form-group">
-                        <label for="customer_address">Address</label>
+                        <label for="customer_address">地址 / Address</label>
                         <input type="text" id="customer_address" name="customer_address">
                     </div>
                     <div class="form-group">
-                        <label for="customer_phone">Phone</label>
+                        <label for="customer_phone">电话 / Phone</label>
                         <input type="text" id="customer_phone" name="customer_phone">
                     </div>
                     <div class="form-group">
-                        <label for="customer_email">Email</label>
+                        <label for="customer_email">邮箱 / Email</label>
                         <input type="email" id="customer_email" name="customer_email">
                     </div>
                 </div>
@@ -78,26 +78,26 @@
 
             <!-- 运输详情 -->
             <section class="form-section">
-                <h2>Shipping Details (Optional)</h2>
+                <h2>运输详情（可选）/ Shipping Details (Optional)</h2>
                 <div class="form-grid">
                     <div class="form-group">
-                        <label for="port_of_shipment">Port of Shipment</label>
+                        <label for="port_of_shipment">起运港 / Port of Shipment</label>
                         <input type="text" id="port_of_shipment" name="port_of_shipment">
                     </div>
                     <div class="form-group">
-                        <label for="country_of_origin">Country of Origin</label>
+                        <label for="country_of_origin">原产国 / Country of Origin</label>
                         <input type="text" id="country_of_origin" name="country_of_origin">
                     </div>
                     <div class="form-group">
-                        <label for="port_of_destination">Port of Destination</label>
+                        <label for="port_of_destination">目的港 / Port of Destination</label>
                         <input type="text" id="port_of_destination" name="port_of_destination">
                     </div>
                     <div class="form-group">
-                        <label for="place_of_destination">Place of Final Destination</label>
+                        <label for="place_of_destination">最终目的地 / Place of Final Destination</label>
                         <input type="text" id="place_of_destination" name="place_of_destination">
                     </div>
                     <div class="form-group">
-                        <label for="shipment_term">Shipment Term</label>
+                        <label for="shipment_term">运输条款 / Shipment Term</label>
                         <input type="text" id="shipment_term" name="shipment_term" placeholder="e.g., EXW, FOB, CIF">
                     </div>
                 </div>
@@ -105,7 +105,7 @@
 
             <!-- 发票信息 -->
             <section class="form-section">
-                <h2>发票信息</h2>
+                <h2>发票信息 / Invoice Information</h2>
                 <div class="form-grid">
                     <div class="form-group">
                         <label for="invoice_number">Invoice No. <span class="required">*</span></label>
@@ -119,23 +119,30 @@
                         <label for="po_number">Purchase Order No.</label>
                         <input type="text" id="po_number" name="po_number">
                     </div>
+                    <div class="form-group">
+                        <label for="currency">Currency <span class="required">*</span></label>
+                        <select id="currency" name="currency" required>
+                            <option value="CNY">CNY (人民币)</option>
+                            <option value="USD">USD (美元)</option>
+                        </select>
+                    </div>
                 </div>
             </section>
 
             <!-- 发货方信息 -->
             <section class="form-section">
-                <h2>Shipper Information (Optional)</h2>
+                <h2>发货方信息（可选）/ Shipper Information (Optional)</h2>
                 <div class="form-grid">
                     <div class="form-group">
-                        <label for="shipper_name">Shipper Name</label>
+                        <label for="shipper_name">发货方名称 / Shipper Name</label>
                         <input type="text" id="shipper_name" name="shipper_name">
                     </div>
                     <div class="form-group">
-                        <label for="shipper_address">Shipper Address</label>
+                        <label for="shipper_address">发货方地址 / Shipper Address</label>
                         <input type="text" id="shipper_address" name="shipper_address">
                     </div>
                     <div class="form-group">
-                        <label for="shipper_phone">Shipper Phone</label>
+                        <label for="shipper_phone">发货方电话 / Shipper Phone</label>
                         <input type="text" id="shipper_phone" name="shipper_phone">
                     </div>
                 </div>
@@ -143,9 +150,9 @@
 
             <!-- 产品总体描述 -->
             <section class="form-section">
-                <h2>Product Description (Optional)</h2>
+                <h2>产品总体描述（可选）/ Product Description (Optional)</h2>
                 <div class="form-group">
-                    <label for="product_description">Product Description (overall)</label>
+                    <label for="product_description">产品总体描述 / Product Description</label>
                     <input type="text" id="product_description" name="product_description">
                 </div>
             </section>
@@ -153,41 +160,41 @@
             <!-- 发票项目 -->
             <section class="form-section">
                 <div class="section-header">
-                    <h2>Invoice Items</h2>
+                    <h2>发票项目 / Invoice Items</h2>
                     <button type="button" class="btn btn-secondary" id="addItemBtn">+ Add Item</button>
                 </div>
                 <div id="itemsContainer">
                     <div class="item-row" data-item-index="0">
                         <div class="form-group">
-                            <label>Product Name</label>
+                            <label>产品名称 / Product Name</label>
                             <input type="text" name="item_product_name_0">
                         </div>
                         <div class="form-group">
-                            <label>Product Number</label>
+                            <label>产品编号 / Product Number</label>
                             <input type="text" name="item_product_number_0">
                         </div>
                         <div class="form-group">
-                            <label>Item Number</label>
+                            <label>项目编号 / Item Number</label>
                             <input type="text" name="item_item_number_0">
                         </div>
                         <div class="form-group">
-                            <label>HS Code</label>
+                            <label>HS编码 / HS Code</label>
                             <input type="text" name="item_hs_code_0">
                         </div>
                         <div class="form-group">
-                            <label>Description <span class="required">*</span></label>
+                            <label>描述 / Description <span class="required">*</span></label>
                             <input type="text" name="item_description_0" required>
                         </div>
                         <div class="form-group">
-                            <label>Quantity <span class="required">*</span></label>
+                            <label>数量 / Quantity <span class="required">*</span></label>
                             <input type="number" name="item_quantity_0" step="0.01" min="0" required>
                         </div>
                         <div class="form-group">
-                            <label>Unit Price (CNY) <span class="required">*</span></label>
+                            <label class="unit-price-label">Unit Price <span class="required">*</span></label>
                             <input type="number" name="item_unit_price_0" step="0.01" min="0" required>
                         </div>
                         <div class="form-group">
-                            <label>Amount (CNY)</label>
+                            <label class="amount-label">Amount</label>
                             <input type="number" name="item_amount_0" step="0.01" min="0" readonly>
                         </div>
                         <div class="form-group">
@@ -200,14 +207,14 @@
 
             <!-- 费用信息 -->
             <section class="form-section">
-                <h2>费用信息</h2>
+                <h2>费用信息 / Fee Information</h2>
                 <div class="form-grid">
                     <div class="form-group">
-                        <label for="tax_rate">税率 (%)</label>
+                        <label for="tax_rate">税率 (%) / Tax Rate (%)</label>
                         <input type="number" id="tax_rate" name="tax_rate" step="0.01" min="0" value="0">
                     </div>
                     <div class="form-group">
-                        <label for="discount">折扣金额</label>
+                        <label for="discount">折扣金额 / Discount Amount</label>
                         <input type="number" id="discount" name="discount" step="0.01" min="0" value="0">
                     </div>
                 </div>
@@ -215,18 +222,18 @@
 
             <!-- 支付信息 -->
             <section class="form-section">
-                <h2>支付信息（可选）</h2>
+                <h2>支付信息（可选）/ Payment Information (Optional)</h2>
                 <div class="form-grid">
                     <div class="form-group">
-                        <label for="bank">银行名称</label>
+                        <label for="bank">银行名称 / Bank Name</label>
                         <input type="text" id="bank" name="bank">
                     </div>
                     <div class="form-group">
-                        <label for="account">账户号码</label>
+                        <label for="account">账户号码 / Account Number</label>
                         <input type="text" id="account" name="account">
                     </div>
                     <div class="form-group">
-                        <label for="swift">SWIFT代码</label>
+                        <label for="swift">SWIFT代码 / SWIFT Code</label>
                         <input type="text" id="swift" name="swift">
                     </div>
                 </div>
@@ -234,18 +241,18 @@
 
             <!-- 备注 -->
             <section class="form-section">
-                <h2>备注</h2>
+                <h2>备注 / Notes</h2>
                 <div class="form-group">
-                    <label for="notes">备注信息</label>
+                    <label for="notes">备注信息 / Notes</label>
                     <textarea id="notes" name="notes" rows="3" placeholder="请输入备注信息..."></textarea>
                 </div>
             </section>
 
             <!-- 图章 -->
             <section class="form-section">
-                <h2>公司图章（可选）</h2>
+                <h2>公司图章（可选）/ Company Stamp (Optional)</h2>
                 <div class="form-group">
-                    <label for="company_stamp">图章图片</label>
+                    <label for="company_stamp">图章图片 / Stamp Image</label>
                     <input type="file" id="company_stamp" name="company_stamp" accept="image/*">
                     <small class="file-hint">支持 PNG, JPG, JPEG, GIF, BMP, WEBP 格式，建议尺寸 200x200px 或更大，将显示在发票底部</small>
                     <div id="stamp-preview" class="image-preview"></div>
@@ -254,22 +261,22 @@
 
             <!-- 总计预览 -->
             <section class="form-section summary-section">
-                <h2>费用总计</h2>
+                <h2>费用总计 / Total Summary</h2>
                 <div class="summary-box">
                     <div class="summary-row">
-                        <span>小计:</span>
+                        <span>小计 / Subtotal:</span>
                         <span id="subtotal">¥0.00</span>
                     </div>
                     <div class="summary-row">
-                        <span>折扣:</span>
+                        <span>折扣 / Discount:</span>
                         <span id="discount-display">-¥0.00</span>
                     </div>
                     <div class="summary-row">
-                        <span>税费:</span>
+                        <span>税费 / Tax:</span>
                         <span id="tax-amount">¥0.00</span>
                     </div>
                     <div class="summary-row total">
-                        <span>总计:</span>
+                        <span>总计 / Total:</span>
                         <span id="total">¥0.00</span>
                     </div>
                 </div>
@@ -320,6 +327,8 @@
                 newItem.querySelector('input[name^="item_unit_price"]').value = '';
                 newItem.querySelector('input[name^="item_amount"]').name = `item_amount_${index}`;
                 newItem.querySelector('input[name^="item_amount"]').value = '';
+                // 更新新项目的标签
+                updateCurrencyLabels(newItem);
                 newItem.querySelector('.remove-item').style.display = 'block';
                 
                 container.appendChild(newItem);
@@ -364,6 +373,39 @@
                 attachItemListeners(item);
             });
 
+            // 获取货币符号
+            function getCurrencySymbol() {
+                const currency = document.getElementById('currency').value;
+                return currency === 'USD' ? '$' : '¥';
+            }
+            
+            // 更新货币标签
+            function updateCurrencyLabels(element = null) {
+                const currency = document.getElementById('currency').value;
+                const currencyText = currency === 'USD' ? 'USD' : 'CNY';
+                const elements = element ? [element] : document.querySelectorAll('.item-row');
+                
+                elements.forEach(row => {
+                    const unitPriceLabel = row.querySelector('.unit-price-label');
+                    const amountLabel = row.querySelector('.amount-label');
+                    if (unitPriceLabel) {
+                        unitPriceLabel.innerHTML = `Unit Price (${currencyText}) <span class="required">*</span>`;
+                    }
+                    if (amountLabel) {
+                        amountLabel.innerHTML = `Amount (${currencyText})`;
+                    }
+                });
+            }
+            
+            // 监听货币变化
+            document.getElementById('currency').addEventListener('change', function() {
+                updateCurrencyLabels();
+                updateSummary();
+            });
+            
+            // 初始化货币标签
+            updateCurrencyLabels();
+
             // 更新总计
             function updateSummary() {
                 let subtotal = 0;
@@ -375,11 +417,13 @@
                 const discount = parseFloat(document.getElementById('discount').value) || 0;
                 const taxAmount = subtotal * (taxRate / 100);
                 const total = subtotal - discount + taxAmount;
+                
+                const symbol = getCurrencySymbol();
 
-                document.getElementById('subtotal').textContent = '¥' + subtotal.toFixed(2);
-                document.getElementById('discount-display').textContent = '-¥' + discount.toFixed(2);
-                document.getElementById('tax-amount').textContent = '¥' + taxAmount.toFixed(2);
-                document.getElementById('total').textContent = '¥' + total.toFixed(2);
+                document.getElementById('subtotal').textContent = symbol + subtotal.toFixed(2);
+                document.getElementById('discount-display').textContent = '-' + symbol + discount.toFixed(2);
+                document.getElementById('tax-amount').textContent = symbol + taxAmount.toFixed(2);
+                document.getElementById('total').textContent = symbol + total.toFixed(2);
             }
 
             // 监听税率和折扣变化

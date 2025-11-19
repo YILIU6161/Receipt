@@ -35,6 +35,9 @@ class InvoiceGenerator:
         )
         self.story = []
         self.styles = getSampleStyleSheet()
+        self._total_amount = 0
+        self._total_quantity = 0
+        self.currency = 'CNY'  # 默认货币
         
         # 注册中文字体（如果系统有的话）
         self._setup_fonts()
@@ -57,6 +60,39 @@ class InvoiceGenerator:
             invoice_info: 发票信息字典 {'number': '', 'date': '', 'po_number': ''}
             logo_path: 公司Logo图片路径（可选）
         """
+        # 如果有Logo，先显示Logo（居中显示）
+        if logo_path:
+            try:
+                # 尝试使用绝对路径
+                if os.path.exists(logo_path):
+                    abs_logo_path = os.path.abspath(logo_path)
+                else:
+                    # 如果相对路径不存在，尝试在当前目录查找
+                    abs_logo_path = os.path.abspath(logo_path)
+                    if not os.path.exists(abs_logo_path):
+                        print(f"Warning: Logo file not found: {logo_path}")
+                        logo_path = None
+                
+                if logo_path and os.path.exists(abs_logo_path):
+                    logo_img = Image(abs_logo_path, width=3*cm, height=3*cm)
+                    # 使用表格来居中显示logo
+                    logo_table = Table([[logo_img]], colWidths=[16*cm])
+                    logo_table.setStyle(TableStyle([
+                        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+                        ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+                        ('LEFTPADDING', (0, 0), (-1, -1), 0),
+                        ('RIGHTPADDING', (0, 0), (-1, -1), 0),
+                        ('TOPPADDING', (0, 0), (-1, -1), 0),
+                        ('BOTTOMPADDING', (0, 0), (-1, -1), 0),
+                    ]))
+                    self.story.append(logo_table)
+                    self.story.append(Spacer(1, 0.2*cm))
+            except Exception as e:
+                print(f"Warning: Could not load logo image: {e}")
+                print(f"Logo path: {logo_path}")
+                import traceback
+                traceback.print_exc()
+        
         # 创建文本样式
         company_style = ParagraphStyle(
             'CompanyInfo',
@@ -462,7 +498,7 @@ class InvoiceGenerator:
                 textColor=colors.HexColor('#333333'),
                 spaceAfter=8
             )
-            desc_para = Paragraph(f"Product Description (overall): {product_description}", desc_style)
+            desc_para = Paragraph(f"Product Description: {product_description}", desc_style)
             self.story.append(desc_para)
             self.story.append(Spacer(1, 0.2*cm))
         
@@ -475,7 +511,7 @@ class InvoiceGenerator:
             textColor=colors.black
         )
         
-        # 表头 - 添加Product Name列
+        # 表头 - 添加Product Name列（去掉货币单位）
         table_data = [[
             Paragraph('No.', cell_style),
             Paragraph('Product Name', cell_style),
@@ -483,8 +519,8 @@ class InvoiceGenerator:
             Paragraph('Item Number', cell_style),
             Paragraph('HS Code', cell_style),
             Paragraph('Quantity', cell_style),
-            Paragraph('Unit Price (CNY)', cell_style),
-            Paragraph('Amount (CNY)', cell_style)
+            Paragraph('Unit Price', cell_style),
+            Paragraph('Amount', cell_style)
         ]]
         
         # 添加项目数据
@@ -506,6 +542,7 @@ class InvoiceGenerator:
             total_quantity += quantity
             
             # 转义HTML特殊字符并创建Paragraph对象以支持自动换行
+            # 去掉货币单位，只显示数字
             table_data.append([
                 Paragraph(str(idx), cell_style),
                 Paragraph(escape(product_name), cell_style),
@@ -513,8 +550,8 @@ class InvoiceGenerator:
                 Paragraph(escape(item_number), cell_style),
                 Paragraph(escape(hs_code), cell_style),
                 Paragraph(f"{quantity:.0f}", cell_style),
-                Paragraph(f"CNY {unit_price:.2f}", cell_style),
-                Paragraph(f"CNY {amount:,.2f}", cell_style)
+                Paragraph(f"{unit_price:.2f}", cell_style),
+                Paragraph(f"{amount:,.2f}", cell_style)
             ])
         
         # 创建表格 - 调整列宽以适应新列（包含Product Name）
@@ -558,7 +595,7 @@ class InvoiceGenerator:
         tax_amount = 0  # 税费在add_total中计算
         total = total_amount  # 暂时使用总金额，实际会在add_total中计算
         
-        # 添加总计行到表格数据中
+        # 添加总计行到表格数据中（去掉货币单位）
         if total_quantity > 0:
             table_data.append([
                 Paragraph('', cell_style),
@@ -568,7 +605,7 @@ class InvoiceGenerator:
                 Paragraph('', cell_style),
                 Paragraph(f"<b>{total_quantity:.0f}</b>", cell_style),
                 Paragraph('', cell_style),
-                Paragraph(f"<b>CNY {total_amount:,.2f}</b>", cell_style)
+                Paragraph(f"<b>{total_amount:,.2f}</b>", cell_style)
             ])
         else:
             table_data.append([
@@ -579,7 +616,7 @@ class InvoiceGenerator:
                 Paragraph('', cell_style),
                 Paragraph('', cell_style),
                 Paragraph('', cell_style),
-                Paragraph(f"<b>CNY {total_amount:,.2f}</b>", cell_style)
+                Paragraph(f"<b>{total_amount:,.2f}</b>", cell_style)
             ])
         
         # 重新创建包含总计行的表格
@@ -663,11 +700,13 @@ class InvoiceGenerator:
         )
         
         total_data = []
+        # 根据货币类型显示标签
+        currency_label = self.currency if hasattr(self, 'currency') else 'CNY'
         total_data.extend([
-            ['', '', '', '', '', '', 'Subtotal:', f"CNY {subtotal:,.2f}"],
-            ['', '', '', '', '', '', 'Discount:', f"-CNY {discount:,.2f}"],
-            ['', '', '', '', '', '', 'Tax:', f"CNY {tax_amount:,.2f}"],
-            ['', '', '', '', '', '', '<b>Total Amount (CNY):</b>', f"<b>CNY {total:,.2f}</b>"],
+            ['', '', '', '', '', '', 'Subtotal:', f"{subtotal:,.2f}"],
+            ['', '', '', '', '', '', 'Discount:', f"-{discount:,.2f}"],
+            ['', '', '', '', '', '', 'Tax:', f"{tax_amount:,.2f}"],
+            ['', '', '', '', '', '', f'<b>Total Amount ({currency_label}):</b>', f"<b>{total:,.2f}</b>"],
         ])
         
         total_table = Table(
@@ -778,7 +817,8 @@ def create_invoice(
     stamp_path: Optional[str] = None,
     shipper_info: Optional[Dict[str, str]] = None,
     shipping_info: Optional[Dict[str, str]] = None,
-    product_description: Optional[str] = None
+    product_description: Optional[str] = None,
+    currency: str = 'CNY'
 ) -> str:
     """
     创建发票的便捷函数
@@ -803,6 +843,7 @@ def create_invoice(
         生成的PDF文件路径
     """
     generator = InvoiceGenerator(output_path)
+    generator.currency = currency.upper()  # 保存货币类型
     generator.add_header(company_info, invoice_info, logo_path)
     
     # 添加发货方和收货方信息（并排显示）

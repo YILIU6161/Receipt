@@ -184,6 +184,9 @@ def generate_invoice():
         # 产品总体描述（可选）
         product_description = data.get('product_description', '')
         
+        # 获取货币类型
+        currency = data.get('currency', 'CNY').upper()
+        
         # 发票信息
         invoice_info = {
             'number': data.get('invoice_number', ''),
@@ -251,7 +254,8 @@ def generate_invoice():
                 stamp_path=stamp_path,
                 shipper_info=shipper_info,
                 shipping_info=shipping_info,
-                product_description=product_description if product_description else None
+                product_description=product_description if product_description else None,
+                currency=currency
             )
         except Exception as e:
             # 如果生成失败，清理上传的文件
