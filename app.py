@@ -2,7 +2,7 @@
 """
 Flask Web应用 - 发票生成器前端
 """
-from flask import Flask, render_template, request, send_file, jsonify
+from flask import Flask, render_template, request, send_file, jsonify, make_response
 from invoice_generator import create_invoice
 from datetime import datetime, timedelta
 import os
@@ -19,6 +19,28 @@ app.config['UPLOAD_FOLDER'] = os.path.join(BASE_DIR, 'generated_invoices')
 app.config['UPLOAD_IMAGES'] = os.path.join(BASE_DIR, 'uploaded_images')
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max file size
 
+# 添加响应头以支持Chrome浏览器
+@app.after_request
+def after_request(response):
+    """添加必要的HTTP响应头"""
+    # 允许跨域（如果需要）
+    response.headers['Access-Control-Allow-Origin'] = '*'
+    response.headers['Access-Control-Allow-Methods'] = 'GET, POST, OPTIONS'
+    response.headers['Access-Control-Allow-Headers'] = 'Content-Type'
+    
+    # 安全策略头
+    response.headers['X-Content-Type-Options'] = 'nosniff'
+    response.headers['X-Frame-Options'] = 'SAMEORIGIN'
+    response.headers['X-XSS-Protection'] = '1; mode=block'
+    
+    # 确保正确的Content-Type
+    if response.content_type and 'text/html' in response.content_type:
+        response.headers['Content-Type'] = 'text/html; charset=utf-8'
+    elif response.content_type and 'application/json' in response.content_type:
+        response.headers['Content-Type'] = 'application/json; charset=utf-8'
+    
+    return response
+
 # 确保输出目录存在
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 os.makedirs(app.config['UPLOAD_IMAGES'], exist_ok=True)
@@ -34,13 +56,25 @@ def allowed_file(filename):
 @app.route('/')
 def index():
     """首页 - 显示发票表单"""
-    return render_template('index.html')
+    response = make_response(render_template('index.html'))
+    response.headers['Content-Type'] = 'text/html; charset=utf-8'
+    return response
 
 
 @app.route('/health')
 def health_check():
     """健康检查端点"""
     return jsonify({'status': 'ok', 'message': '服务运行正常'}), 200
+
+
+@app.route('/<path:path>', methods=['OPTIONS'])
+def handle_options(path):
+    """处理OPTIONS预检请求"""
+    response = make_response()
+    response.headers['Access-Control-Allow-Origin'] = '*'
+    response.headers['Access-Control-Allow-Methods'] = 'GET, POST, OPTIONS'
+    response.headers['Access-Control-Allow-Headers'] = 'Content-Type'
+    return response
 
 
 @app.route('/generate', methods=['POST'])
