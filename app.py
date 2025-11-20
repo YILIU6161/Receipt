@@ -177,9 +177,6 @@ def generate_invoice():
                 'shipment_term': data.get('shipment_term', '')
             }
         
-        # 产品总体描述（可选）
-        product_description = data.get('product_description', '')
-        
         # 获取货币类型
         currency = data.get('currency', 'CNY').upper()
         
@@ -195,9 +192,9 @@ def generate_invoice():
         item_count = int(data.get('item_count', 1))
         
         for i in range(item_count):
-            description = data.get(f'item_description_{i}', '')
-            if description:  # 只添加非空项目
-                product_name = data.get(f'item_product_name_{i}', '')
+            product_name = data.get(f'item_product_name_{i}', '').strip()
+            if product_name:  # 只添加有产品名称的项目（产品名称为必填项）
+                description = data.get(f'item_description_{i}', '')
                 product_number = data.get(f'item_product_number_{i}', '')
                 item_number = data.get(f'item_item_number_{i}', '')
                 hs_code = data.get(f'item_hs_code_{i}', '')
@@ -250,7 +247,6 @@ def generate_invoice():
                 logo_path=logo_path,
                 stamp_path=stamp_path,
                 shipping_info=shipping_info,
-                product_description=product_description if product_description else None,
                 currency=currency
             )
         except Exception as e:
