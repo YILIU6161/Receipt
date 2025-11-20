@@ -28,8 +28,8 @@ class InvoiceGenerator:
         self.doc = SimpleDocTemplate(
             output_path,
             pagesize=A4,
-            rightMargin=1.5*cm,
-            leftMargin=1.5*cm,
+            rightMargin=1.0*cm,
+            leftMargin=1.0*cm,
             topMargin=1.5*cm,
             bottomMargin=1.5*cm
         )
@@ -477,6 +477,16 @@ class InvoiceGenerator:
             textColor=colors.black
         )
         
+        # 创建单行文本样式（用于不允许换行的列）
+        single_line_style = ParagraphStyle(
+            'SingleLineCell',
+            parent=self.styles['Normal'],
+            fontSize=8,
+            leading=10,
+            textColor=colors.black,
+            wordWrap='CJK'  # 允许 CJK 字符换行，但尽量保持单行
+        )
+        
         # 表头 - 添加Product Name列，金额相关列显示货币单位
         currency_label = self.currency if hasattr(self, 'currency') else 'CNY'
         table_data = [[
@@ -508,26 +518,27 @@ class InvoiceGenerator:
             total_amount += amount
             total_quantity += quantity
             
-            # 转义HTML特殊字符并创建Paragraph对象以支持自动换行
-            # 去掉货币单位，只显示数字
-            # 所有项目内容加粗并添加下划线
+            # 转义HTML特殊字符并创建Paragraph对象
+            # Product Name 允许换行，其他列使用单行样式以确保在一行显示
+            # 所有项目内容加粗（去掉下划线）
             table_data.append([
-                Paragraph(str(idx), cell_style),
-                Paragraph(f"<b><u>{escape(product_name)}</u></b>", cell_style),
-                Paragraph(f"<b><u>{escape(product_number)}</u></b>", cell_style),
-                Paragraph(f"<b><u>{escape(item_number)}</u></b>", cell_style),
-                Paragraph(f"<b><u>{escape(hs_code)}</u></b>", cell_style),
-                Paragraph(f"<b><u>{quantity:.0f}</u></b>", cell_style),
-                Paragraph(f"<b><u>{unit_price:.2f}</u></b>", cell_style),
-                Paragraph(f"<b><u>{amount:,.2f}</u></b>", cell_style)
+                Paragraph(str(idx), single_line_style),
+                Paragraph(f"<b>{escape(product_name)}</b>", cell_style),  # Product Name 允许换行
+                Paragraph(f"<b>{escape(product_number)}</b>", single_line_style),
+                Paragraph(f"<b>{escape(item_number)}</b>", single_line_style),
+                Paragraph(f"<b>{escape(hs_code)}</b>", single_line_style),
+                Paragraph(f"<b>{quantity:.0f}</b>", single_line_style),
+                Paragraph(f"<b>{unit_price:.2f}</b>", single_line_style),
+                Paragraph(f"<b>{amount:,.2f}</b>", single_line_style)
             ])
         
         # 创建表格 - 调整列宽以适应新列（包含Product Name）
-        # A4宽度21cm，减去左右边距3cm，可用宽度18cm
-        # 列宽分配：No.(0.7) + Product Name(4.5) + Product No.(2.5) + Item No.(2.5) + HS Code(1.5) + Quantity(1.0) + Unit Price(1.5) + Amount(1.8) = 16.5cm
+        # A4宽度21cm，减去左右边距2cm，可用宽度19cm
+        # 列宽分配：No.(0.7) + Product Name(4.5) + Product No.(3.0) + Item No.(3.0) + HS Code(2.0) + Quantity(1.2) + Unit Price(2.0) + Amount(2.6) = 19cm
+        # Product Name 允许换行，其他列增加宽度以确保单行显示
         items_table = Table(
             table_data,
-            colWidths=[0.7*cm, 4.5*cm, 2.5*cm, 2.5*cm, 1.5*cm, 1.0*cm, 1.5*cm, 1.8*cm]
+            colWidths=[0.7*cm, 4.5*cm, 3.0*cm, 3.0*cm, 2.0*cm, 1.2*cm, 2.0*cm, 2.6*cm]
         )
         
         # 设置表格样式
@@ -590,7 +601,7 @@ class InvoiceGenerator:
         # 重新创建包含总计行的表格
         items_table = Table(
             table_data,
-            colWidths=[0.7*cm, 4.5*cm, 2.5*cm, 2.5*cm, 1.5*cm, 1.0*cm, 1.5*cm, 1.8*cm]
+            colWidths=[0.7*cm, 4.5*cm, 3.0*cm, 3.0*cm, 2.0*cm, 1.2*cm, 2.0*cm, 2.6*cm]
         )
         
         # 设置表格样式（包括总计行）
@@ -679,7 +690,7 @@ class InvoiceGenerator:
         
         total_table = Table(
             total_data,
-            colWidths=[0.7*cm, 4.5*cm, 2.5*cm, 2.5*cm, 1.5*cm, 1.0*cm, 1.5*cm, 1.8*cm]
+            colWidths=[0.7*cm, 4.5*cm, 3.0*cm, 3.0*cm, 2.0*cm, 1.2*cm, 2.0*cm, 2.6*cm]
         )
         
         total_table.setStyle(TableStyle([
