@@ -477,7 +477,8 @@ class InvoiceGenerator:
             textColor=colors.black
         )
         
-        # 表头 - 添加Product Name列（去掉货币单位）
+        # 表头 - 添加Product Name列，金额相关列显示货币单位
+        currency_label = self.currency if hasattr(self, 'currency') else 'CNY'
         table_data = [[
             Paragraph('No.', cell_style),
             Paragraph('Product Name', cell_style),
@@ -485,8 +486,8 @@ class InvoiceGenerator:
             Paragraph('Item Number', cell_style),
             Paragraph('HS Code', cell_style),
             Paragraph('Quantity', cell_style),
-            Paragraph('Unit Price', cell_style),
-            Paragraph('Amount', cell_style)
+            Paragraph(f'Unit Price ({currency_label})', cell_style),
+            Paragraph(f'Amount ({currency_label})', cell_style)
         ]]
         
         # 添加项目数据
@@ -670,9 +671,9 @@ class InvoiceGenerator:
         # 根据货币类型显示标签
         currency_label = self.currency if hasattr(self, 'currency') else 'CNY'
         total_data.extend([
-            ['', '', '', '', '', '', 'Subtotal:', f"{subtotal:,.2f}"],
-            ['', '', '', '', '', '', 'Discount:', f"-{discount:,.2f}"],
-            ['', '', '', '', '', '', 'Tax:', f"{tax_amount:,.2f}"],
+            ['', '', '', '', '', '', f'Subtotal ({currency_label}):', f"{subtotal:,.2f}"],
+            ['', '', '', '', '', '', f'Discount ({currency_label}):', f"-{discount:,.2f}"],
+            ['', '', '', '', '', '', f'Tax ({currency_label}):', f"{tax_amount:,.2f}"],
             ['', '', '', '', '', '', f'<b>Total Amount ({currency_label}):</b>', f"<b>{total:,.2f}</b>"],
         ])
         
