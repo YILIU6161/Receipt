@@ -90,10 +90,9 @@ header h1 {
     font-size: 0.95em;
 }
 
-/* 必填字段标签加粗并添加下划线 */
+/* 必填字段标签加粗（不添加下划线） */
 .form-group label:has(span.required) {
     font-weight: bold;
-    text-decoration: underline;
 }
 
 .required {

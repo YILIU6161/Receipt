@@ -520,16 +520,16 @@ class InvoiceGenerator:
             
             # 转义HTML特殊字符并创建Paragraph对象
             # Product Name 允许换行，其他列使用单行样式以确保在一行显示
-            # 所有项目内容加粗（去掉下划线）
+            # 所有项目内容加粗并添加下划线
             table_data.append([
                 Paragraph(str(idx), single_line_style),
-                Paragraph(f"<b>{escape(product_name)}</b>", cell_style),  # Product Name 允许换行
-                Paragraph(f"<b>{escape(product_number)}</b>", single_line_style),
-                Paragraph(f"<b>{escape(item_number)}</b>", single_line_style),
-                Paragraph(f"<b>{escape(hs_code)}</b>", single_line_style),
-                Paragraph(f"<b>{quantity:.0f}</b>", single_line_style),
-                Paragraph(f"<b>{unit_price:.2f}</b>", single_line_style),
-                Paragraph(f"<b>{amount:,.2f}</b>", single_line_style)
+                Paragraph(f"<b><u>{escape(product_name)}</u></b>", cell_style),  # Product Name 允许换行
+                Paragraph(f"<b><u>{escape(product_number)}</u></b>", single_line_style),
+                Paragraph(f"<b><u>{escape(item_number)}</u></b>", single_line_style),
+                Paragraph(f"<b><u>{escape(hs_code)}</u></b>", single_line_style),
+                Paragraph(f"<b><u>{quantity:.0f}</u></b>", single_line_style),
+                Paragraph(f"<b><u>{unit_price:.2f}</u></b>", single_line_style),
+                Paragraph(f"<b><u>{amount:,.2f}</u></b>", single_line_style)
             ])
         
         # 创建表格 - 调整列宽以适应新列（包含Product Name）
