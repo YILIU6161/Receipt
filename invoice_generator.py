@@ -488,16 +488,17 @@ class InvoiceGenerator:
         )
         
         # 表头 - 添加Product Name列，金额相关列显示货币单位
+        # 表头内容加粗并居中显示
         currency_label = self.currency if hasattr(self, 'currency') else 'CNY'
         table_data = [[
-            Paragraph('No.', cell_style),
-            Paragraph('Product Name', cell_style),
-            Paragraph('Product Number', cell_style),
-            Paragraph('Item Number', cell_style),
-            Paragraph('HS Code', cell_style),
-            Paragraph('Quantity', cell_style),
-            Paragraph(f'Unit Price ({currency_label})', cell_style),
-            Paragraph(f'Amount ({currency_label})', cell_style)
+            Paragraph('<b>No.</b>', cell_style),
+            Paragraph('<b>Product Name</b>', cell_style),
+            Paragraph('<b>Product Number</b>', cell_style),
+            Paragraph('<b>Item Number</b>', cell_style),
+            Paragraph('<b>HS Code</b>', cell_style),
+            Paragraph('<b>Quantity</b>', cell_style),
+            Paragraph(f'<b>Unit Price ({currency_label})</b>', cell_style),
+            Paragraph(f'<b>Amount ({currency_label})</b>', cell_style)
         ]]
         
         # 添加项目数据
@@ -520,16 +521,16 @@ class InvoiceGenerator:
             
             # 转义HTML特殊字符并创建Paragraph对象
             # Product Name 允许换行，其他列使用单行样式以确保在一行显示
-            # 所有项目内容加粗并添加下划线
+            # 所有项目内容普通显示（不加粗，无下划线）
             table_data.append([
                 Paragraph(str(idx), single_line_style),
-                Paragraph(f"<b><u>{escape(product_name)}</u></b>", cell_style),  # Product Name 允许换行
-                Paragraph(f"<b><u>{escape(product_number)}</u></b>", single_line_style),
-                Paragraph(f"<b><u>{escape(item_number)}</u></b>", single_line_style),
-                Paragraph(f"<b><u>{escape(hs_code)}</u></b>", single_line_style),
-                Paragraph(f"<b><u>{quantity:.0f}</u></b>", single_line_style),
-                Paragraph(f"<b><u>{unit_price:.2f}</u></b>", single_line_style),
-                Paragraph(f"<b><u>{amount:,.2f}</u></b>", single_line_style)
+                Paragraph(f"{escape(product_name)}", cell_style),  # Product Name 允许换行
+                Paragraph(f"{escape(product_number)}", single_line_style),
+                Paragraph(f"{escape(item_number)}", single_line_style),
+                Paragraph(f"{escape(hs_code)}", single_line_style),
+                Paragraph(f"{quantity:.0f}", single_line_style),
+                Paragraph(f"{unit_price:.2f}", single_line_style),
+                Paragraph(f"{amount:,.2f}", single_line_style)
             ])
         
         # 创建表格 - 调整列宽以适应新列（包含Product Name）
@@ -559,10 +560,7 @@ class InvoiceGenerator:
             ('FONTSIZE', (0, 1), (-1, -1), 8),
             ('GRID', (0, 0), (-1, -1), 1, colors.grey),
             ('VALIGN', (0, 0), (-1, -1), 'TOP'),  # 改为TOP以便多行文本正确显示
-            ('ALIGN', (0, 1), (0, -1), 'CENTER'),  # No. 居中
-            ('ALIGN', (1, 1), (4, -1), 'LEFT'),  # Product Name, Product Number, Item Number, HS Code 左对齐
-            ('ALIGN', (5, 1), (5, -1), 'CENTER'),  # Quantity 居中
-            ('ALIGN', (6, 1), (7, -1), 'RIGHT'),  # Unit Price, Amount 右对齐
+            ('ALIGN', (0, 1), (-1, -1), 'CENTER'),  # 所有数据列居中
             ('LEFTPADDING', (0, 0), (-1, -1), 4),
             ('RIGHTPADDING', (0, 0), (-1, -1), 4),
             ('TOPPADDING', (0, 1), (-1, -1), 4),
@@ -632,13 +630,12 @@ class InvoiceGenerator:
             # 边框
             ('GRID', (0, 0), (-1, total_row_idx), 1, colors.grey),
             ('VALIGN', (0, 0), (-1, -1), 'TOP'),
-            ('ALIGN', (0, 1), (0, total_row_idx-1), 'CENTER'),  # No. 居中
-            ('ALIGN', (1, 1), (4, total_row_idx-1), 'LEFT'),  # Product Name, Product Number, Item Number, HS Code 左对齐
-            ('ALIGN', (5, 1), (5, total_row_idx-1), 'CENTER'),  # Quantity 居中
-            ('ALIGN', (6, 1), (7, total_row_idx-1), 'RIGHT'),  # Unit Price, Amount 右对齐
+            ('ALIGN', (0, 1), (-1, total_row_idx-1), 'CENTER'),  # 所有数据列居中
             ('ALIGN', (1, total_row_idx), (1, total_row_idx), 'LEFT'),  # TOTAL 左对齐
+            ('ALIGN', (0, total_row_idx), (0, total_row_idx), 'CENTER'),  # 总计行其他列居中
+            ('ALIGN', (2, total_row_idx), (4, total_row_idx), 'CENTER'),  # 总计行其他列居中
             ('ALIGN', (5, total_row_idx), (5, total_row_idx), 'CENTER'),  # 总数量居中
-            ('ALIGN', (7, total_row_idx), (7, total_row_idx), 'RIGHT'),  # 总金额右对齐
+            ('ALIGN', (6, total_row_idx), (7, total_row_idx), 'CENTER'),  # 总金额居中
             ('LEFTPADDING', (0, 0), (-1, -1), 4),
             ('RIGHTPADDING', (0, 0), (-1, -1), 4),
             ('TOPPADDING', (0, 1), (-1, -1), 4),
