@@ -206,13 +206,13 @@ class InvoiceGenerator:
         shipper_text_parts = ['<b>Shipper</b><br/>']
         shipper_name = shipper_info.get('name', '') or ''
         if shipper_name:
-            shipper_text_parts.append(f"{escape(shipper_name)}<br/>")
+            shipper_text_parts.append(f"Shipper Name: {escape(shipper_name)}<br/>")
         shipper_address = shipper_info.get('address', '') or ''
         if shipper_address:
-            shipper_text_parts.append(f"{escape(shipper_address)}<br/>")
+            shipper_text_parts.append(f"Shipper Address: {escape(shipper_address)}<br/>")
         shipper_phone = shipper_info.get('phone', '') or ''
         if shipper_phone:
-            shipper_text_parts.append(f"{escape(shipper_phone)}")
+            shipper_text_parts.append(f"Shipper Contact: {escape(shipper_phone)}")
         
         # 构建收货方信息文本（右列）
         customer_text_parts = ['<b>Consignee/Buyer</b><br/>']
@@ -509,23 +509,24 @@ class InvoiceGenerator:
             
             # 转义HTML特殊字符并创建Paragraph对象以支持自动换行
             # 去掉货币单位，只显示数字
+            # 所有项目内容加粗并添加下划线
             table_data.append([
                 Paragraph(str(idx), cell_style),
-                Paragraph(escape(product_name), cell_style),
-                Paragraph(escape(product_number), cell_style),
-                Paragraph(escape(item_number), cell_style),
-                Paragraph(escape(hs_code), cell_style),
-                Paragraph(f"{quantity:.0f}", cell_style),
-                Paragraph(f"{unit_price:.2f}", cell_style),
-                Paragraph(f"{amount:,.2f}", cell_style)
+                Paragraph(f"<b><u>{escape(product_name)}</u></b>", cell_style),
+                Paragraph(f"<b><u>{escape(product_number)}</u></b>", cell_style),
+                Paragraph(f"<b><u>{escape(item_number)}</u></b>", cell_style),
+                Paragraph(f"<b><u>{escape(hs_code)}</u></b>", cell_style),
+                Paragraph(f"<b><u>{quantity:.0f}</u></b>", cell_style),
+                Paragraph(f"<b><u>{unit_price:.2f}</u></b>", cell_style),
+                Paragraph(f"<b><u>{amount:,.2f}</u></b>", cell_style)
             ])
         
         # 创建表格 - 调整列宽以适应新列（包含Product Name）
         # A4宽度21cm，减去左右边距3cm，可用宽度18cm
-        # 列宽分配：No.(0.7) + Product Name(3.5) + Product No.(1.5) + Item No.(1.5) + HS Code(1.5) + Quantity(1.0) + Unit Price(1.5) + Amount(1.8) = 14cm
+        # 列宽分配：No.(0.7) + Product Name(4.5) + Product No.(2.5) + Item No.(2.5) + HS Code(1.5) + Quantity(1.0) + Unit Price(1.5) + Amount(1.8) = 16.5cm
         items_table = Table(
             table_data,
-            colWidths=[0.7*cm, 3.5*cm, 1.5*cm, 1.5*cm, 1.5*cm, 1.0*cm, 1.5*cm, 1.8*cm]
+            colWidths=[0.7*cm, 4.5*cm, 2.5*cm, 2.5*cm, 1.5*cm, 1.0*cm, 1.5*cm, 1.8*cm]
         )
         
         # 设置表格样式
@@ -588,7 +589,7 @@ class InvoiceGenerator:
         # 重新创建包含总计行的表格
         items_table = Table(
             table_data,
-            colWidths=[0.7*cm, 3.5*cm, 1.5*cm, 1.5*cm, 1.5*cm, 1.0*cm, 1.5*cm, 1.8*cm]
+            colWidths=[0.7*cm, 4.5*cm, 2.5*cm, 2.5*cm, 1.5*cm, 1.0*cm, 1.5*cm, 1.8*cm]
         )
         
         # 设置表格样式（包括总计行）
@@ -677,7 +678,7 @@ class InvoiceGenerator:
         
         total_table = Table(
             total_data,
-            colWidths=[0.7*cm, 3.5*cm, 1.5*cm, 1.5*cm, 1.5*cm, 1.0*cm, 1.5*cm, 1.8*cm]
+            colWidths=[0.7*cm, 4.5*cm, 2.5*cm, 2.5*cm, 1.5*cm, 1.0*cm, 1.5*cm, 1.8*cm]
         )
         
         total_table.setStyle(TableStyle([

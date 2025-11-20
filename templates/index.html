@@ -16,26 +16,7 @@
         </header>
 
         <form id="invoiceForm" class="invoice-form" enctype="multipart/form-data">
-            <!-- 发货方信息 -->
-            <section class="form-section">
-                <h2>发货方信息 / Shipper Information</h2>
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label for="shipper_name">发货方名称 / Shipper Name <span class="required">*</span></label>
-                        <input type="text" id="shipper_name" name="shipper_name" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="shipper_address">发货方地址 / Shipper Address <span class="required">*</span></label>
-                        <input type="text" id="shipper_address" name="shipper_address" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="shipper_phone">发货方联系方式 / Shipper Contact <span class="required">*</span></label>
-                        <input type="text" id="shipper_phone" name="shipper_phone" required>
-                    </div>
-                </div>
-            </section>
-
-            <!-- 公司信息 -->
+            <!-- 开票方信息 -->
             <section class="form-section">
                 <h2>开票方信息 / Issuer Information</h2>
                 <div class="form-grid">
@@ -52,6 +33,25 @@
                         <input type="file" id="company_logo" name="company_logo" accept="image/*">
                         <small class="file-hint">支持 PNG, JPG, JPEG, GIF, BMP, WEBP 格式，建议尺寸 200x200px 或更大</small>
                         <div id="logo-preview" class="image-preview"></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 发货方信息 -->
+            <section class="form-section">
+                <h2>发货方信息 / Shipper Information</h2>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="shipper_name">发货方名称 / Shipper Name <span class="required">*</span></label>
+                        <input type="text" id="shipper_name" name="shipper_name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="shipper_address">发货方地址 / Shipper Address <span class="required">*</span></label>
+                        <input type="text" id="shipper_address" name="shipper_address" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="shipper_phone">发货方联系方式 / Shipper Contact <span class="required">*</span></label>
+                        <input type="text" id="shipper_phone" name="shipper_phone" required>
                     </div>
                 </div>
             </section>
